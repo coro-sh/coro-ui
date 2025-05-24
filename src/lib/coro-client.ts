@@ -5,7 +5,7 @@ import type {
 	NamespaceResponse,
 	OperatorProxyTokenResponse,
 	OperatorResponse,
-	OperatorStatus,
+	OperatorStatus, StreamResponse,
 	UpdateAccountRequest,
 	UpdateUserRequest,
 	UserIssuanceResponse,
@@ -251,6 +251,18 @@ export class CoroClient {
 				method: 'GET',
 				headers: { 'Content-Type': 'application/json' },
 				body: null
+			}
+		);
+	}
+
+	// JetStream methods
+
+	async listStreams(accountId: string): Promise<StreamResponse[]> {
+		return this.client.request<StreamResponse[]>(
+			`/namespaces/${get(activeNamespaceId)}/accounts/${accountId}/streams`,
+			{
+				method: 'GET',
+				headers: { 'Content-Type': 'application/json' }
 			}
 		);
 	}

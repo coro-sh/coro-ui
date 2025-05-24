@@ -5,7 +5,7 @@ export function shortenStr(str?: string, maxLen: number = 30): string {
 	return str.length > maxLen ? `${str.slice(0, maxLen)}...` : str;
 }
 
-export function formatEpoch(epoch: number): string {
+export function formatEpochSeconds(epoch: number): string {
 	return new Intl.DateTimeFormat(navigator.language, {
 		year: 'numeric',
 		month: 'short',

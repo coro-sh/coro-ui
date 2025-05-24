@@ -18,13 +18,9 @@ export interface UpdateUserRequest {
 	limits?: UserLimits;
 }
 
-export type Response<T> =
-	| ResponseData<T>
-	| ResponseError
+export type Response<T> = ResponseData<T> | ResponseError;
 
-export type ResponsePage<T> =
-	| ResponsePageData<T>
-	| ResponseError
+export type ResponsePage<T> = ResponsePageData<T> | ResponseError;
 
 export interface ResponseData<T> {
 	data: T;
@@ -98,6 +94,14 @@ export interface UserLimits {
 	subscriptions?: number;
 	payload_size?: number;
 	jwt_duration_secs?: number;
+}
+
+export interface StreamResponse {
+	name: string;
+	subjects: string[];
+	message_count: number;
+	consumer_count: string;
+	create_time: number;
 }
 
 export interface OperatorProxyTokenResponse {

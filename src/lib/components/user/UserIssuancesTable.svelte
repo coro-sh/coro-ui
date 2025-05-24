@@ -13,7 +13,7 @@
 	} from 'flowbite-svelte';
 	import PlaceholderBlock from '$lib/components/text/PlaceholderBlock.svelte';
 	import { Paginator } from '$lib/http';
-	import { formatEpoch } from '$lib/util';
+	import { formatEpochSeconds } from '$lib/util';
 	import { showErrorToast } from '$lib/stores/toast';
 
 	export let user: UserResponse;
@@ -99,10 +99,10 @@
 						<TableBodyRow
 							class={i < issuances.length - 1 ? 'border-b border-light-border dark:border-dark-border' : ''}>
 							<TableBodyCell class="p-4 text-light-base dark:text-dark-base">
-								{formatEpoch(iss.issue_time)}
+								{formatEpochSeconds(iss.issue_time)}
 							</TableBodyCell>
 							<TableBodyCell class="p-4 text-light-base dark:text-dark-base">
-								{iss.expire_time ? formatEpoch(iss.expire_time) : 'N/A'}
+								{iss.expire_time ? formatEpochSeconds(iss.expire_time) : 'N/A'}
 							</TableBodyCell>
 							<TableBodyCell class="p-4 text-light-base dark:text-dark-base">
 								{iss.active ? "Active" : "Expired"}

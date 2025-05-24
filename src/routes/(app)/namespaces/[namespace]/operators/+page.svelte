@@ -10,7 +10,7 @@
 	import PlaceholderBlock from '$lib/components/text/PlaceholderBlock.svelte';
 	import ErrorLoadResourceSection from '$lib/components/error/ErrorLoadResourceSection.svelte';
 	import { activeNamespaceId } from '$lib/stores/namespace';
-	import { formatEpoch } from '$lib/util';
+	import { formatEpochSeconds } from '$lib/util';
 	import { showErrorToast } from '$lib/stores/toast';
 
 	let loading = true;
@@ -127,7 +127,7 @@
 									</Badge>
 									{#if operator.status.connected && operator.status.connect_time}
         <span class="flex ml-2 mt-1 text-xs text-light-base dark:text-dark-base break-words overflow-hidden">
-          {formatEpoch(operator.status.connect_time)}
+          {formatEpochSeconds(operator.status.connect_time)}
         </span>
 									{/if}
 								</div>
