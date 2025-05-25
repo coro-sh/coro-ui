@@ -7,7 +7,7 @@
 		"build": "vite build",
 		"preview": "vite preview",
 		"build:local": "vite build",
-		"build:server": "VITE_API_ADDRESS= vite build",
+		"build:server": "VITE_API_ADDRESS= VITE_API_ADDRESS= vite build",
 		"preview:server": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",

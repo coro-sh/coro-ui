@@ -107,3 +107,14 @@ export interface StreamResponse {
 export interface OperatorProxyTokenResponse {
 	token: string;
 }
+
+export interface StartStreamConsumerRequest {
+	account_id: string;
+	stream: string;
+}
+
+export interface ConsumerMessageResponse {
+	data: string; // Base64-encoded or UTF-8 encoded string from Go []byte
+	stream_sequence: number;
+	messages_pending: number;
+}
