@@ -55,7 +55,7 @@
 			<BreadcrumbItem href="/namespaces/{$activeNamespaceId}/operators/{operatorId}?tab=3">Accounts</BreadcrumbItem>
 			<BreadcrumbItem {loading}
 											href="/namespaces/{$activeNamespaceId}/operators/{operatorId}/{accountId}">{account?.name}</BreadcrumbItem>
-			<BreadcrumbItem href="/namespaces/{$activeNamespaceId}/operators/{operatorId}/{accountId}?tab=2">Users
+			<BreadcrumbItem href="/namespaces/{$activeNamespaceId}/operators/{operatorId}/{accountId}?tab=3">Users
 			</BreadcrumbItem>
 			<BreadcrumbItem {loading}
 											href="/namespaces/{$activeNamespaceId}/operators/{operatorId}/{accountId}/{userId}">{user?.name}</BreadcrumbItem>

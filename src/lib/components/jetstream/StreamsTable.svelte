@@ -5,11 +5,14 @@
 	import More from '$lib/components/nav/More.svelte';
 	import { goto } from '$app/navigation';
 	import { formatEpochSeconds } from '$lib/util';
+	import { activeNamespaceId } from '$lib/stores/namespace';
 
 	export let loading = true;
+	export let operatorId: string;
+	export let accountId: string;
 	export let streams: StreamResponse[];
 
-	const columns = ['Name', 'Consumers', 'Messages', 'Created', ''];
+	const columns = ['Name', 'Messages', 'Consumers', 'Created', ''];
 </script>
 
 <div class="overflow-x-auto">
@@ -43,9 +46,9 @@
 					{#each streams as stream}
 						<TableBodyRow
 							class={'cursor-pointer hover:bg-light-contentHover dark:hover:bg-dark-contentHover border-light-border dark:border-dark-border'}
-							on:click={() => {goto('');}}
+							on:click={() => {goto(`/namespaces/${$activeNamespaceId}/operators/${operatorId}/${accountId}/streams/${stream.name}`);}}
 						>
-							{#each [stream.name, stream.consumer_count, stream.message_count, formatEpochSeconds(stream.create_time)] as val}
+							{#each [stream.name, stream.message_count, stream.consumer_count, formatEpochSeconds(stream.create_time)] as val}
 								<TableBodyCell class="p-4 text-light-base dark:text-dark-base">
 									{val}
 								</TableBodyCell>

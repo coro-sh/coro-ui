@@ -100,7 +100,7 @@
 							Streams
 						</Heading>
 					</Toolbar>
-					<StreamsTable bind:loading streams={streams} />
+					<StreamsTable bind:loading operatorId={operatorId} accountId={accountId} streams={streams} />
 				</TabCard>
 			</div>
 			<div slot="3">

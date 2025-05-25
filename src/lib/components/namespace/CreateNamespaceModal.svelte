@@ -2,8 +2,6 @@
 	import { Input, Label } from 'flowbite-svelte';
 	import EntityModal from '$lib/components/entity/EntityModal.svelte';
 	import { CoroClient } from '$lib/coro-client';
-	import ErrorToast from '$lib/components/toast/ErrorToast.svelte';
-	import { toError } from '$lib/error';
 	import { activeNamespaceId, namespaces } from '$lib/stores/namespace';
 	import { goto } from '$app/navigation';
 	import { showErrorToast } from '$lib/stores/toast';

@@ -66,7 +66,7 @@
 						{value || 'Unknown'}
 					</Badge>
 				{:else}
-					<p class="text-sm">{value || 'N/A'}</p>
+					<p class="text-sm">{value ?? 'N/A'}</p>
 				{/if}
 			{/if}
 		</div>

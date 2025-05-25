@@ -266,4 +266,14 @@ export class CoroClient {
 			}
 		);
 	}
+
+	async fetchStream(accountId: string, streamName: string): Promise<StreamResponse> {
+		return this.client.request<StreamResponse>(
+			`/namespaces/${get(activeNamespaceId)}/accounts/${accountId}/streams/${streamName}`,
+			{
+				method: 'GET',
+				headers: { 'Content-Type': 'application/json' }
+			}
+		);
+	}
 }
