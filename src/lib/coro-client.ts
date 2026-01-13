@@ -12,20 +12,18 @@ import type {
 	UserResponse
 } from '$lib/models/entity';
 import { Client, Paginator } from '$lib/http';
-import { activeNamespaceId } from '$lib/stores/namespace';
-import { get } from 'svelte/store';
+import { namespaceStore } from '$lib/stores/namespace.svelte';
+import { API_BASE_URL } from '$lib/config/api-base-url';
 
-function getAPIBaseURL(): string {
-	const baseURL = import.meta.env.VITE_API_ADDRESS;
-	return baseURL.endsWith('/') ? baseURL.slice(0, -1) : baseURL;
-}
+// Re-export Paginator for convenience
+export { Paginator } from '$lib/http';
+export type { Paginator as PaginatorType } from '$lib/http';
 
 export class CoroClient {
 	private readonly client: Client;
 
 	constructor() {
-		const apiBaseURL = getAPIBaseURL();
-		this.client = new Client(apiBaseURL + '/api/v1');
+		this.client = new Client(API_BASE_URL + '/api/v1');
 	}
 
 	// Namespace methods
@@ -52,7 +50,7 @@ export class CoroClient {
 
 	async createOperator(name: string): Promise<OperatorResponse> {
 		return this.client.request<OperatorResponse>(
-			`/namespaces/${get(activeNamespaceId)}/operators`,
+			`/namespaces/${namespaceStore.activeId}/operators`,
 			{
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
@@ -63,7 +61,7 @@ export class CoroClient {
 
 	async updateOperatorName(operatorId: string, name: string): Promise<OperatorResponse> {
 		return this.client.request<OperatorResponse>(
-			`/namespaces/${get(activeNamespaceId)}/operators/${operatorId}`,
+			`/namespaces/${namespaceStore.activeId}/operators/${operatorId}`,
 			{
 				method: 'PUT',
 				headers: { 'Content-Type': 'application/json' },
@@ -74,7 +72,7 @@ export class CoroClient {
 
 	async fetchOperator(operatorId: string): Promise<OperatorResponse> {
 		return this.client.request<OperatorResponse>(
-			`/namespaces/${get(activeNamespaceId)}/operators/${operatorId}`,
+			`/namespaces/${namespaceStore.activeId}/operators/${operatorId}`,
 			{
 				method: 'GET',
 				headers: { 'Content-Type': 'application/json' }
@@ -84,7 +82,7 @@ export class CoroClient {
 
 	async fetchNATSConfigContent(operatorId: string): Promise<string> {
 		return this.client.request<string>(
-			`/namespaces/${get(activeNamespaceId)}/operators/${operatorId}/nats-config`,
+			`/namespaces/${namespaceStore.activeId}/operators/${operatorId}/nats-config`,
 			{
 				method: 'GET',
 				headers: { 'Content-Type': 'text/plain' }
@@ -95,7 +93,7 @@ export class CoroClient {
 	paginateOperators(size?: number, cursor?: string): Paginator<OperatorResponse> {
 		return new Paginator<OperatorResponse>(
 			this.client,
-			`/namespaces/${get(activeNamespaceId)}/operators`,
+			`/namespaces/${namespaceStore.activeId}/operators`,
 			size,
 			cursor
 		);
@@ -103,7 +101,7 @@ export class CoroClient {
 
 	async deleteOperator(operatorId: string): Promise<void> {
 		return this.client.requestNoContent(
-			`/namespaces/${get(activeNamespaceId)}/operators/${operatorId}`,
+			`/namespaces/${namespaceStore.activeId}/operators/${operatorId}`,
 			{
 				method: 'DELETE'
 			}
@@ -114,7 +112,7 @@ export class CoroClient {
 
 	async createAccount(operatorId: string, req: CreateAccountRequest): Promise<AccountResponse> {
 		return this.client.request<AccountResponse>(
-			`/namespaces/${get(activeNamespaceId)}/operators/${operatorId}/accounts`,
+			`/namespaces/${namespaceStore.activeId}/operators/${operatorId}/accounts`,
 			{
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
@@ -125,7 +123,7 @@ export class CoroClient {
 
 	async updateAccount(accountId: string, req: UpdateAccountRequest): Promise<AccountResponse> {
 		return this.client.request<AccountResponse>(
-			`/namespaces/${get(activeNamespaceId)}/accounts/${accountId}`,
+			`/namespaces/${namespaceStore.activeId}/accounts/${accountId}`,
 			{
 				method: 'PUT',
 				headers: { 'Content-Type': 'application/json' },
@@ -136,7 +134,7 @@ export class CoroClient {
 
 	async fetchAccount(accountId: string): Promise<AccountResponse> {
 		return this.client.request<AccountResponse>(
-			`/namespaces/${get(activeNamespaceId)}/accounts/${accountId}`,
+			`/namespaces/${namespaceStore.activeId}/accounts/${accountId}`,
 			{
 				method: 'GET',
 				headers: { 'Content-Type': 'application/json' }
@@ -147,7 +145,7 @@ export class CoroClient {
 	paginateAccounts(operatorId: string, size?: number, cursor?: string): Paginator<AccountResponse> {
 		return new Paginator<AccountResponse>(
 			this.client,
-			`/namespaces/${get(activeNamespaceId)}/operators/${operatorId}/accounts`,
+			`/namespaces/${namespaceStore.activeId}/operators/${operatorId}/accounts`,
 			size,
 			cursor
 		);
@@ -155,7 +153,7 @@ export class CoroClient {
 
 	async deleteAccount(accountId: string): Promise<void> {
 		return this.client.requestNoContent(
-			`/namespaces/${get(activeNamespaceId)}/accounts/${accountId}`,
+			`/namespaces/${namespaceStore.activeId}/accounts/${accountId}`,
 			{
 				method: 'DELETE'
 			}
@@ -166,7 +164,7 @@ export class CoroClient {
 
 	async createUser(accountId: string, req: CreateUserRequest): Promise<UserResponse> {
 		return this.client.request<UserResponse>(
-			`/namespaces/${get(activeNamespaceId)}/accounts/${accountId}/users`,
+			`/namespaces/${namespaceStore.activeId}/accounts/${accountId}/users`,
 			{
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
@@ -177,7 +175,7 @@ export class CoroClient {
 
 	async updateUser(userId: string, req: UpdateUserRequest): Promise<UserResponse> {
 		return this.client.request<UserResponse>(
-			`/namespaces/${get(activeNamespaceId)}/users/${userId}`,
+			`/namespaces/${namespaceStore.activeId}/users/${userId}`,
 			{
 				method: 'PUT',
 				headers: { 'Content-Type': 'application/json' },
@@ -188,7 +186,7 @@ export class CoroClient {
 
 	async fetchUser(userId: string): Promise<UserResponse> {
 		return this.client.request<UserResponse>(
-			`/namespaces/${get(activeNamespaceId)}/users/${userId}`,
+			`/namespaces/${namespaceStore.activeId}/users/${userId}`,
 			{
 				method: 'GET',
 				headers: { 'Content-Type': 'application/json' }
@@ -198,7 +196,7 @@ export class CoroClient {
 
 	async downloadUserCreds(userId: string) {
 		await this.client.download(
-			`/namespaces/${get(activeNamespaceId)}/users/${userId}/creds`,
+			`/namespaces/${namespaceStore.activeId}/users/${userId}/creds`,
 			`${userId}.creds`
 		);
 	}
@@ -206,14 +204,14 @@ export class CoroClient {
 	paginateUsers(accountId: string, size?: number, cursor?: string): Paginator<UserResponse> {
 		return new Paginator<UserResponse>(
 			this.client,
-			`/namespaces/${get(activeNamespaceId)}/accounts/${accountId}/users`,
+			`/namespaces/${namespaceStore.activeId}/accounts/${accountId}/users`,
 			size,
 			cursor
 		);
 	}
 
 	async deleteUser(userId: string): Promise<void> {
-		return this.client.requestNoContent(`/namespaces/${get(activeNamespaceId)}/users/${userId}`, {
+		return this.client.requestNoContent(`/namespaces/${namespaceStore.activeId}/users/${userId}`, {
 			method: 'DELETE'
 		});
 	}
@@ -225,7 +223,7 @@ export class CoroClient {
 	): Paginator<UserIssuanceResponse> {
 		return new Paginator<UserIssuanceResponse>(
 			this.client,
-			`/namespaces/${get(activeNamespaceId)}/users/${userId}/issuances`,
+			`/namespaces/${namespaceStore.activeId}/users/${userId}/issuances`,
 			size,
 			cursor
 		);
@@ -235,7 +233,7 @@ export class CoroClient {
 
 	async createOperatorProxyToken(operatorId: string): Promise<OperatorProxyTokenResponse> {
 		return this.client.request<OperatorProxyTokenResponse>(
-			`/namespaces/${get(activeNamespaceId)}/operators/${operatorId}/proxy/token`,
+			`/namespaces/${namespaceStore.activeId}/operators/${operatorId}/proxy/token`,
 			{
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
@@ -246,7 +244,7 @@ export class CoroClient {
 
 	async getOperatorProxyStatus(operatorId: string): Promise<OperatorStatus> {
 		return this.client.request<OperatorStatus>(
-			`/namespaces/${get(activeNamespaceId)}/operators/${operatorId}/proxy/status`,
+			`/namespaces/${namespaceStore.activeId}/operators/${operatorId}/proxy/status`,
 			{
 				method: 'GET',
 				headers: { 'Content-Type': 'application/json' },

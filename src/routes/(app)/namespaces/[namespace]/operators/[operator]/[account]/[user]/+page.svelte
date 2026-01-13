@@ -1,34 +1,36 @@
 <script lang="ts">
-	import { Card, Heading } from 'flowbite-svelte';
+	import { Skeleton } from '$lib/components/ui/skeleton';
+	import * as Card from '$lib/components/ui/card';
+	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
+	import TabGroup from '$lib/components/ui/tab/TabGroup.svelte';
+	import TabCard from '$lib/components/ui/tab/TabCard.svelte';
+	import UserOverview from '$lib/components/ui/user/UserOverview.svelte';
+	import UserIssuancesTable, {
+		type UserIssuancesTableApi
+	} from '$lib/components/ui/user/UserIssuancesTable.svelte';
+	import UserGetConnected from '$lib/components/ui/user/UserGetConnected.svelte';
+	import ErrorLoadResourceSection from '$lib/components/ui/error/ErrorLoadResourceSection.svelte';
 	import { onMount } from 'svelte';
-	import { page } from '$app/stores';
-	import type { AccountResponse, OperatorResponse, UserResponse } from '$lib/models/entity';
-	import TabGroup from '$lib/components/tab/TabGroup.svelte';
-	import TabCard from '$lib/components/tab/TabCard.svelte';
-	import UserOverview from '$lib/components/user/UserOverview.svelte';
 	import { CoroClient } from '$lib/coro-client';
-	import BreadcrumbItem from '$lib/components/breacrumb/BreadcrumbItem.svelte';
-	import Breadcrumb from '$lib/components/breacrumb/Breadcrumb.svelte';
-	import PlaceholderLine from '$lib/components/text/PlaceholderLine.svelte';
-	import ErrorLoadResourceSection from '$lib/components/error/ErrorLoadResourceSection.svelte';
-	import { activeNamespaceId } from '$lib/stores/namespace';
-	import UserIssuancesTable from '$lib/components/user/UserIssuancesTable.svelte';
-	import UserGetConnected from '$lib/components/user/UserGetConnected.svelte';
-	import { showErrorToast } from '$lib/stores/toast';
+	import type { AccountResponse, OperatorResponse, UserResponse } from '$lib/models/entity';
+	import { page } from '$app/state';
+	import { showError } from '$lib/stores/toast';
 
-	const operatorId = $page.params.operator;
-	const accountId = $page.params.account;
-	const userId = $page.params.user;
+	import Home from '@lucide/svelte/icons/home';
 
-	let loading = true;
-	let operator: OperatorResponse;
-	let account: AccountResponse;
-	let user: UserResponse;
+	const namespaceId = $derived(page.params.namespace ?? '');
+	const operatorId = $derived(page.params.operator ?? '');
+	const accountId = $derived(page.params.account ?? '');
+	const userId = $derived(page.params.user ?? '');
 
-	let loadFailed = false;
+	let loading = $state(true);
+	let loadFailed = $state(false);
+	let operator = $state<OperatorResponse | undefined>(undefined);
+	let account = $state<AccountResponse | undefined>(undefined);
+	let user = $state<UserResponse | undefined>(undefined);
+	let issuancesApi = $state<UserIssuancesTableApi | undefined>(undefined);
 
 	const client = new CoroClient();
-	let issuancesComponent: UserIssuancesTable;
 
 	onMount(async () => {
 		loading = true;
@@ -37,7 +39,7 @@
 			account = await client.fetchAccount(accountId);
 			user = await client.fetchUser(userId);
 		} catch (e) {
-			showErrorToast(e);
+			showError(e as Error);
 			loadFailed = true;
 		} finally {
 			loading = false;
@@ -49,55 +51,106 @@
 	{#if loadFailed}
 		<ErrorLoadResourceSection />
 	{:else}
-		<Breadcrumb marginBot={8}>
-			<BreadcrumbItem {loading}
-											href="/namespaces/{$activeNamespaceId}/operators/{operatorId}">{operator?.name}</BreadcrumbItem>
-			<BreadcrumbItem href="/namespaces/{$activeNamespaceId}/operators/{operatorId}?tab=3">Accounts</BreadcrumbItem>
-			<BreadcrumbItem {loading}
-											href="/namespaces/{$activeNamespaceId}/operators/{operatorId}/{accountId}">{account?.name}</BreadcrumbItem>
-			<BreadcrumbItem href="/namespaces/{$activeNamespaceId}/operators/{operatorId}/{accountId}?tab=2">Users
-			</BreadcrumbItem>
-			<BreadcrumbItem {loading}
-											href="/namespaces/{$activeNamespaceId}/operators/{operatorId}/{accountId}/{userId}">{user?.name}</BreadcrumbItem>
-		</Breadcrumb>
+		<Breadcrumb.Root class="mb-8">
+			<Breadcrumb.List>
+				<Breadcrumb.Item>
+					<Breadcrumb.Link
+						href={`/namespaces/${namespaceId}/operators`}
+						class="flex items-center gap-2"
+					>
+						<Home class="size-4" />
+						Operators
+					</Breadcrumb.Link>
+				</Breadcrumb.Item>
+				<Breadcrumb.Separator />
+				<Breadcrumb.Item>
+					<Breadcrumb.Link href={`/namespaces/${namespaceId}/operators/${operatorId}`}>
+						{#if loading}
+							<Skeleton class="h-4 w-24" />
+						{:else}
+							{operator?.name}
+						{/if}
+					</Breadcrumb.Link>
+				</Breadcrumb.Item>
+				<Breadcrumb.Separator />
+				<Breadcrumb.Item>
+					<Breadcrumb.Link
+						href={`/namespaces/${namespaceId}/operators/${operatorId}?tab=3`}
+					>
+						Accounts
+					</Breadcrumb.Link>
+				</Breadcrumb.Item>
+				<Breadcrumb.Separator />
+				<Breadcrumb.Item>
+					<Breadcrumb.Link
+						href={`/namespaces/${namespaceId}/operators/${operatorId}/${accountId}`}
+					>
+						{#if loading}
+							<Skeleton class="h-4 w-24" />
+						{:else}
+							{account?.name}
+						{/if}
+					</Breadcrumb.Link>
+				</Breadcrumb.Item>
+				<Breadcrumb.Separator />
+				<Breadcrumb.Item>
+					<Breadcrumb.Link
+						href={`/namespaces/${namespaceId}/operators/${operatorId}/${accountId}?tab=2`}
+					>
+						Users
+					</Breadcrumb.Link>
+				</Breadcrumb.Item>
+				<Breadcrumb.Separator />
+				<Breadcrumb.Item>
+					<Breadcrumb.Page>
+						{#if loading}
+							<Skeleton class="h-4 w-24" />
+						{:else}
+							{user?.name}
+						{/if}
+					</Breadcrumb.Page>
+				</Breadcrumb.Item>
+			</Breadcrumb.List>
+		</Breadcrumb.Root>
 
-		<div class="mb-3 items-center">
-			<span class="text-3xl font-bold leading-none text-light-base dark:text-dark-base">
-				{#if loading}
-					<div class="mt-10 mb-10">
-						<PlaceholderLine width="2/12" />
-					</div>
-				{:else}
-					{user.name}
-				{/if}
-			</span>
+		<div class="mb-6">
+			{#if loading}
+				<Skeleton class="h-9 w-48" />
+			{:else}
+				<h1 class="text-3xl font-bold">{user?.name}</h1>
+			{/if}
 		</div>
-		<TabGroup tabNames={['Overview', 'Connect']} slotsNoContentWrapper={[2]}>
-			<div slot="1">
-				<TabCard>
-					<UserOverview bind:loading bind:user accountUserJWTLifetime={account?.limits.user_jwt_duration_secs} />
-				</TabCard>
-			</div>
-			<div slot="2">
-				<div class="grid grid-cols-1 gap-4 xl:grid-cols-2">
-					<Card size="xl"
-								class="shadow-sm max-w-none dark:bg-dark-content border-light-border dark:border-dark-border">
-						<div class="m-4 -mb-4">
-							<UserGetConnected userId={user?.id} issuancesComponent={issuancesComponent} />
-						</div>
-					</Card>
-					<Card size="xl"
-								class="shadow-sm max-w-none dark:bg-dark-content border-light-border dark:border-dark-border">
-						<div class="m-4">
-							<Heading tag="h2"
-											 class="mb-6 text-xl font-semibold text-light-base dark:text-dark-base sm:text-2xl w-full pb-2">
-								Credentials Issued
-							</Heading>
-							<UserIssuancesTable user={user} bind:this={issuancesComponent} />
-						</div>
-					</Card>
-				</div>
-			</div>
+
+		<TabGroup tabNames={['Overview', 'Connect']}>
+			{#snippet children(tab)}
+				{#if tab === 1}
+					<TabCard>
+						{#if user}
+							<UserOverview
+								bind:loading
+								bind:user
+								accountUserJWTLifetime={account?.limits.user_jwt_duration_secs}
+							/>
+						{/if}
+					</TabCard>
+				{:else if tab === 2}
+					<div class="grid grid-cols-1 gap-4 xl:grid-cols-2">
+						<Card.Root>
+							<Card.Content class="p-6">
+								<UserGetConnected userId={user?.id} {issuancesApi} />
+							</Card.Content>
+						</Card.Root>
+						<Card.Root>
+							<Card.Content class="p-6">
+								<h2 class="text-xl font-semibold sm:text-2xl mb-6">Credentials Issued</h2>
+								{#if user}
+									<UserIssuancesTable {user} bind:api={issuancesApi} />
+								{/if}
+							</Card.Content>
+						</Card.Root>
+					</div>
+				{/if}
+			{/snippet}
 		</TabGroup>
 	{/if}
 </main>
