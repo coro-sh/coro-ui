@@ -14,7 +14,7 @@
 
 	const limitFields: Array<{ key: keyof UserLimits; label: string }> = [
 		{ key: 'subscriptions', label: 'Subscriptions' },
-		{ key: 'payload_size', label: 'Payload Size (KiB)' }
+		{ key: 'payload_size', label: 'Payload Size (KiB)' },
 	];
 
 	function handleLimitChange(key: keyof UserLimits, e: Event) {

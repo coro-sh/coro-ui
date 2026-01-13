@@ -15,7 +15,7 @@
 		{ key: 'payload_size', label: 'Payload Size (KiB)' },
 		{ key: 'imports', label: 'Imports' },
 		{ key: 'exports', label: 'Exports' },
-		{ key: 'connections', label: 'Connections' }
+		{ key: 'connections', label: 'Connections' },
 	];
 
 	function handleLimitChange(key: keyof AccountLimits, e: Event) {

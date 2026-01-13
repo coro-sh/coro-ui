@@ -25,21 +25,21 @@
 	}
 </script>
 
-<h2 class="text-xl font-semibold sm:text-2xl mb-6">Get connected</h2>
+<h2 class="mb-6 text-xl font-semibold sm:text-2xl">Get connected</h2>
 
 <div class="space-y-8">
 	<!-- Step 1 -->
 	<div class="flex gap-4">
 		<div class="flex flex-col items-center">
 			<div
-				class="flex size-8 items-center justify-center rounded-full bg-muted font-medium text-sm"
+				class="bg-muted flex size-8 items-center justify-center rounded-full text-sm font-medium"
 			>
 				1
 			</div>
-			<div class="h-full w-px bg-border mt-2"></div>
+			<div class="bg-border mt-2 h-full w-px"></div>
 		</div>
-		<div class="flex-1 min-w-0 pb-4">
-			<h3 class="font-semibold mb-2">Download credentials file</h3>
+		<div class="min-w-0 flex-1 pb-4">
+			<h3 class="mb-2 font-semibold">Download credentials file</h3>
 			<div class="mt-4">
 				{#if loading}
 					<Skeleton class="h-9 w-48" />
@@ -57,21 +57,21 @@
 	<div class="flex gap-4">
 		<div class="flex flex-col items-center">
 			<div
-				class="flex size-8 items-center justify-center rounded-full bg-muted font-medium text-sm"
+				class="bg-muted flex size-8 items-center justify-center rounded-full text-sm font-medium"
 			>
 				2
 			</div>
 		</div>
-		<div class="flex-1 min-w-0">
-			<h3 class="font-semibold mb-2">Connect to the Operator NATS server</h3>
+		<div class="min-w-0 flex-1">
+			<h3 class="mb-2 font-semibold">Connect to the Operator NATS server</h3>
 
 			<div class="mt-4">
-				<p class="mb-3 text-sm text-muted-foreground">Using the NATS CLI tool:</p>
-				<CodeBlock content='nats -s nats://<HOST>:<PORT> --creds <PATH_TO_CREDS> sub ">"' />
+				<p class="text-muted-foreground mb-3 text-sm">Using the NATS CLI tool:</p>
+				<CodeBlock content="nats -s nats://<HOST>:<PORT> --creds <PATH_TO_CREDS> sub '>'" />
 			</div>
 
 			<div class="mt-6">
-				<p class="mb-3 text-sm text-muted-foreground">Using a client library:</p>
+				<p class="text-muted-foreground mb-3 text-sm">Using a client library:</p>
 
 				<Tabs.Root value={getConnectedSnippets[0].name}>
 					<Tabs.List>

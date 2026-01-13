@@ -20,8 +20,8 @@
 
 <Table.Row
 	class={cn(
-		'cursor-pointer hover:bg-accent/50 transition-colors',
-		bottomBorder ? 'border-b border-border' : ''
+		'hover:bg-accent/50 cursor-pointer transition-colors',
+		bottomBorder ? 'border-border border-b' : ''
 	)}
 	onclick={navigate}
 >

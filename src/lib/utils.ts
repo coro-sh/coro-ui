@@ -6,9 +6,9 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type WithoutChild<T> = T extends { child?: any } ? Omit<T, "child"> : T;
+export type WithoutChild<T> = T extends { child?: any } ? Omit<T, 'child'> : T;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type WithoutChildren<T> = T extends { children?: any } ? Omit<T, "children"> : T;
+export type WithoutChildren<T> = T extends { children?: any } ? Omit<T, 'children'> : T;
 export type WithoutChildrenOrChild<T> = WithoutChildren<WithoutChild<T>>;
 export type WithElementRef<T, U extends HTMLElement = HTMLElement> = T & { ref?: U | null };
 
@@ -47,12 +47,12 @@ export function formatTimeSince(timestamp: number): string {
 
 	for (const [unit, seconds] of Object.entries(intervals)) {
 		const value = Math.floor(diffInSeconds / seconds);
-		if (value >= 1 || unit === "second") {
+		if (value >= 1 || unit === 'second') {
 			return rtf.format(-value, unit as Intl.RelativeTimeFormatUnit);
 		}
 	}
 
-	return "just now"; // Fallback for very recent times
+	return 'just now'; // Fallback for very recent times
 }
 
 export function formatDuration(seconds?: number): string {
@@ -60,19 +60,19 @@ export function formatDuration(seconds?: number): string {
 		return 'Unlimited';
 	}
 
-	if (seconds === 0) return "0 seconds";
+	if (seconds === 0) return '0 seconds';
 
 	const timeUnits = [
-		{ label: "day", value: Math.floor(seconds / 86400) },
-		{ label: "hour", value: Math.floor((seconds % 86400) / 3600) },
-		{ label: "minute", value: Math.floor((seconds % 3600) / 60) },
-		{ label: "second", value: seconds % 60 }
+		{ label: 'day', value: Math.floor(seconds / 86400) },
+		{ label: 'hour', value: Math.floor((seconds % 86400) / 3600) },
+		{ label: 'minute', value: Math.floor((seconds % 3600) / 60) },
+		{ label: 'second', value: seconds % 60 },
 	];
 
 	return timeUnits
-		.filter(unit => unit.value > 0) // Remove empty units
-		.map(unit => `${unit.value} ${unit.label}${unit.value > 1 ? 's' : ''}`) // Add plural "s" if needed
-		.join(", ");
+		.filter((unit) => unit.value > 0) // Remove empty units
+		.map((unit) => `${unit.value} ${unit.label}${unit.value > 1 ? 's' : ''}`) // Add plural "s" if needed
+		.join(', ');
 }
 
 export function upperCaseFirstChar(str: string): string {
@@ -80,10 +80,10 @@ export function upperCaseFirstChar(str: string): string {
 	return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-export function downloadFile(content: string, filename: string, mimeType = "text/plain") {
+export function downloadFile(content: string, filename: string, mimeType = 'text/plain') {
 	const blob = new Blob([content], { type: mimeType });
 	const url = URL.createObjectURL(blob);
-	const a = document.createElement("a");
+	const a = document.createElement('a');
 	a.href = url;
 	a.download = filename;
 	document.body.appendChild(a);

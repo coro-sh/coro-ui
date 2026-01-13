@@ -23,15 +23,15 @@
 </script>
 
 {#if !namespaceStore.namespaces.length}
-	<div class="flex items-center justify-center h-96">
+	<div class="flex h-96 items-center justify-center">
 		<Card.Root class="w-full max-w-2xl">
 			<Card.Content class="pt-6">
-				<div class="flex items-center justify-center mb-3">
+				<div class="mb-3 flex items-center justify-center">
 					<FolderOpen class="text-muted-foreground size-12" />
 				</div>
-				<div class="text-center text-muted-foreground">
-					<p class="text-2xl font-medium mb-2 text-foreground">No Namespaces found</p>
-					<p class="text-base mb-5">Get started by creating a new Namespace</p>
+				<div class="text-muted-foreground text-center">
+					<p class="text-foreground mb-2 text-2xl font-medium">No Namespaces found</p>
+					<p class="mb-5 text-base">Get started by creating a new Namespace</p>
 					<Button variant="outline" onclick={() => (openCreateNamespaceModal = true)}>
 						<Plus class="size-4" />
 						Create Namespace

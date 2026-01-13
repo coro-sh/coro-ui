@@ -5,44 +5,44 @@ import globals from 'globals';
 
 /** @type {import('eslint').Linter.FlatConfig[]} */
 export default [
-  // Ignores
-  {
-    ignores: ['build/', '.svelte-kit/', 'dist/', '**/*.svelte.ts'],
-  },
+	// Ignores
+	{
+		ignores: ['build/', '.svelte-kit/', 'dist/', '**/*.svelte.ts'],
+	},
 
-  // Base configs
-  js.configs.recommended,
-  ...ts.configs.recommended,
-  ...svelte.configs['flat/recommended'],
+	// Base configs
+	js.configs.recommended,
+	...ts.configs.recommended,
+	...svelte.configs['flat/recommended'],
 
-  // Globals
-  {
-    languageOptions: {
-      globals: {
-        ...globals.browser,
-        ...globals.node,
-      },
-    },
-  },
+	// Globals
+	{
+		languageOptions: {
+			globals: {
+				...globals.browser,
+				...globals.node,
+			},
+		},
+	},
 
-  // Svelte: parse <script> with TS
-  {
-    files: ['**/*.svelte'],
-    languageOptions: {
-      parserOptions: {
-        parser: ts.parser,
-      },
-    },
-  },
+	// Svelte: parse <script> with TS
+	{
+		files: ['**/*.svelte'],
+		languageOptions: {
+			parserOptions: {
+				parser: ts.parser,
+			},
+		},
+	},
 
-  // Overrides
-  {
-    rules: {
-      '@typescript-eslint/no-explicit-any': 'off',
-      'prefer-const': ['error', { ignoreReadBeforeAssign: true }],
-    },
-  },
+	// Overrides
+	{
+		rules: {
+			'@typescript-eslint/no-explicit-any': 'off',
+			'prefer-const': ['error', { ignoreReadBeforeAssign: true }],
+		},
+	},
 
-  // Disable formatting rules that conflict with Prettier
-  ...svelte.configs['flat/prettier'],
+	// Disable formatting rules that conflict with Prettier
+	...svelte.configs['flat/prettier'],
 ];

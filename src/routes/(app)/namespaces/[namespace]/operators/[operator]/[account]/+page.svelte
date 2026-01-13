@@ -87,9 +87,7 @@
 				</Breadcrumb.Item>
 				<Breadcrumb.Separator />
 				<Breadcrumb.Item>
-					<Breadcrumb.Link
-						href={`/namespaces/${namespaceId}/operators/${operatorId}?tab=3`}
-					>
+					<Breadcrumb.Link href={`/namespaces/${namespaceId}/operators/${operatorId}?tab=3`}>
 						Accounts
 					</Breadcrumb.Link>
 				</Breadcrumb.Item>

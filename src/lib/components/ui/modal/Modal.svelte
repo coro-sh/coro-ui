@@ -25,21 +25,21 @@
 		size = 'md',
 		dismissable = true,
 		onsubmit,
-		children
+		children,
 	}: Props = $props();
 
 	const sizeClasses: Record<string, string> = {
 		sm: 'sm:max-w-sm',
 		md: 'sm:max-w-md',
 		lg: 'sm:max-w-lg',
-		xl: 'sm:max-w-xl'
+		xl: 'sm:max-w-xl',
 	};
 
 	const gridColsClasses: Record<number, string> = {
 		1: 'sm:grid-cols-1',
 		2: 'sm:grid-cols-2',
 		3: 'sm:grid-cols-3',
-		4: 'sm:grid-cols-4'
+		4: 'sm:grid-cols-4',
 	};
 
 	function handleOpenChange(value: boolean) {

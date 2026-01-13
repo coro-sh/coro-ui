@@ -19,7 +19,7 @@
 		open = $bindable(false),
 		accountId,
 		users = $bindable([]),
-		accountUserJWTLifetime
+		accountUserJWTLifetime,
 	}: Props = $props();
 
 	let loading = $state(false);

@@ -35,7 +35,13 @@
 	}
 </script>
 
-<EntityModal bind:open bind:loading entityType="operator" modalType="create" onsubmit={handleSubmit}>
+<EntityModal
+	bind:open
+	bind:loading
+	entityType="operator"
+	modalType="create"
+	onsubmit={handleSubmit}
+>
 	<div class="col-span-2">
 		<Label for="name" class="mb-2">Name</Label>
 		<Input bind:value={name} name="name" placeholder="Type operator name" required />

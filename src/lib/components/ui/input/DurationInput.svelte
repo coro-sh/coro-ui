@@ -16,14 +16,14 @@
 		{ value: 'minutes', label: 'Minutes' },
 		{ value: 'hours', label: 'Hours' },
 		{ value: 'days', label: 'Days' },
-		{ value: 'unlimited', label: 'Unlimited' }
+		{ value: 'unlimited', label: 'Unlimited' },
 	];
 
 	const durationMultipliers: Record<string, number> = {
 		seconds: 1,
 		minutes: 60,
 		hours: 3600,
-		days: 86400
+		days: 86400,
 	};
 
 	const selectedLabel = $derived(durationUnits.find((u) => u.value === unit)?.label ?? unit);
@@ -52,7 +52,7 @@
 	}
 </script>
 
-<div class="flex space-x-2 items-center">
+<div class="flex items-center space-x-2">
 	<Select.Root type="single" value={unit} onValueChange={handleUnitChange}>
 		<Select.Trigger class="w-28">
 			{selectedLabel}

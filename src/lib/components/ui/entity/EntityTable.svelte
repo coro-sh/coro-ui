@@ -28,11 +28,11 @@
 		hasMore = $bindable(false),
 		loadingMore = $bindable(false),
 		onloadmore,
-		children
+		children,
 	}: Props = $props();
 </script>
 
-<div class="flex justify-between items-center pb-4">
+<div class="flex items-center justify-between pb-4">
 	<h2 class="text-xl font-semibold sm:text-2xl">{`${upperCaseFirstChar(entityType)}s`}</h2>
 	<Button onclick={() => (openCreateModal = true)}>
 		<Plus class="size-4" />
@@ -61,7 +61,7 @@
 			{:else if isEmpty}
 				<Table.Row>
 					<Table.Cell colspan={columns.length}>
-						<div class="text-center text-muted-foreground my-20">
+						<div class="text-muted-foreground my-20 text-center">
 							<p class="mb-5">{`No ${upperCaseFirstChar(entityType)}s found`}</p>
 							<Button variant="outline" onclick={() => (openCreateModal = true)}>
 								<Plus class="size-4" />
@@ -70,10 +70,8 @@
 						</div>
 					</Table.Cell>
 				</Table.Row>
-			{:else}
-				{#if children}
-					{@render children()}
-				{/if}
+			{:else if children}
+				{@render children()}
 			{/if}
 			{#if hasMore}
 				<Table.Row>

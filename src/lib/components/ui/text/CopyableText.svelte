@@ -26,7 +26,7 @@
 	<Tooltip.Root>
 		<Tooltip.Trigger>
 			<span
-				class="cursor-pointer hover:text-primary {className}"
+				class="hover:text-primary cursor-pointer {className}"
 				id={spanId}
 				role="button"
 				tabindex="0"
@@ -43,7 +43,7 @@
 	</Tooltip.Root>
 {:else}
 	<span
-		class="cursor-pointer hover:text-primary {className}"
+		class="hover:text-primary cursor-pointer {className}"
 		id={spanId}
 		role="button"
 		tabindex="0"

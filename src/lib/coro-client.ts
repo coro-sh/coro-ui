@@ -9,7 +9,7 @@ import type {
 	UpdateAccountRequest,
 	UpdateUserRequest,
 	UserIssuanceResponse,
-	UserResponse
+	UserResponse,
 } from '$lib/models/entity';
 import { Client, Paginator } from '$lib/http';
 import { namespaceStore } from '$lib/stores/namespace.svelte';
@@ -32,7 +32,7 @@ export class CoroClient {
 		return this.client.request<NamespaceResponse>('/namespaces', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ name })
+			body: JSON.stringify({ name }),
 		});
 	}
 
@@ -42,7 +42,7 @@ export class CoroClient {
 
 	async deleteNamespace(namespaceId: string): Promise<void> {
 		return this.client.requestNoContent(`/namespaces/${namespaceId}`, {
-			method: 'DELETE'
+			method: 'DELETE',
 		});
 	}
 
@@ -54,7 +54,7 @@ export class CoroClient {
 			{
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ name })
+				body: JSON.stringify({ name }),
 			}
 		);
 	}
@@ -65,7 +65,7 @@ export class CoroClient {
 			{
 				method: 'PUT',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ name })
+				body: JSON.stringify({ name }),
 			}
 		);
 	}
@@ -75,7 +75,7 @@ export class CoroClient {
 			`/namespaces/${namespaceStore.activeId}/operators/${operatorId}`,
 			{
 				method: 'GET',
-				headers: { 'Content-Type': 'application/json' }
+				headers: { 'Content-Type': 'application/json' },
 			}
 		);
 	}
@@ -85,7 +85,7 @@ export class CoroClient {
 			`/namespaces/${namespaceStore.activeId}/operators/${operatorId}/nats-config`,
 			{
 				method: 'GET',
-				headers: { 'Content-Type': 'text/plain' }
+				headers: { 'Content-Type': 'text/plain' },
 			}
 		);
 	}
@@ -103,7 +103,7 @@ export class CoroClient {
 		return this.client.requestNoContent(
 			`/namespaces/${namespaceStore.activeId}/operators/${operatorId}`,
 			{
-				method: 'DELETE'
+				method: 'DELETE',
 			}
 		);
 	}
@@ -116,7 +116,7 @@ export class CoroClient {
 			{
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(req)
+				body: JSON.stringify(req),
 			}
 		);
 	}
@@ -127,7 +127,7 @@ export class CoroClient {
 			{
 				method: 'PUT',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(req)
+				body: JSON.stringify(req),
 			}
 		);
 	}
@@ -137,7 +137,7 @@ export class CoroClient {
 			`/namespaces/${namespaceStore.activeId}/accounts/${accountId}`,
 			{
 				method: 'GET',
-				headers: { 'Content-Type': 'application/json' }
+				headers: { 'Content-Type': 'application/json' },
 			}
 		);
 	}
@@ -155,7 +155,7 @@ export class CoroClient {
 		return this.client.requestNoContent(
 			`/namespaces/${namespaceStore.activeId}/accounts/${accountId}`,
 			{
-				method: 'DELETE'
+				method: 'DELETE',
 			}
 		);
 	}
@@ -168,7 +168,7 @@ export class CoroClient {
 			{
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(req)
+				body: JSON.stringify(req),
 			}
 		);
 	}
@@ -179,7 +179,7 @@ export class CoroClient {
 			{
 				method: 'PUT',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(req)
+				body: JSON.stringify(req),
 			}
 		);
 	}
@@ -189,7 +189,7 @@ export class CoroClient {
 			`/namespaces/${namespaceStore.activeId}/users/${userId}`,
 			{
 				method: 'GET',
-				headers: { 'Content-Type': 'application/json' }
+				headers: { 'Content-Type': 'application/json' },
 			}
 		);
 	}
@@ -212,7 +212,7 @@ export class CoroClient {
 
 	async deleteUser(userId: string): Promise<void> {
 		return this.client.requestNoContent(`/namespaces/${namespaceStore.activeId}/users/${userId}`, {
-			method: 'DELETE'
+			method: 'DELETE',
 		});
 	}
 
@@ -237,7 +237,7 @@ export class CoroClient {
 			{
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: null
+				body: null,
 			}
 		);
 	}
@@ -248,7 +248,7 @@ export class CoroClient {
 			{
 				method: 'GET',
 				headers: { 'Content-Type': 'application/json' },
-				body: null
+				body: null,
 			}
 		);
 	}

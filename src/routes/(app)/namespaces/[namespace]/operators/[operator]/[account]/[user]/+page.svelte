@@ -6,7 +6,7 @@
 	import TabCard from '$lib/components/ui/tab/TabCard.svelte';
 	import UserOverview from '$lib/components/ui/user/UserOverview.svelte';
 	import UserIssuancesTable, {
-		type UserIssuancesTableApi
+		type UserIssuancesTableApi,
 	} from '$lib/components/ui/user/UserIssuancesTable.svelte';
 	import UserGetConnected from '$lib/components/ui/user/UserGetConnected.svelte';
 	import ErrorLoadResourceSection from '$lib/components/ui/error/ErrorLoadResourceSection.svelte';
@@ -74,17 +74,13 @@
 				</Breadcrumb.Item>
 				<Breadcrumb.Separator />
 				<Breadcrumb.Item>
-					<Breadcrumb.Link
-						href={`/namespaces/${namespaceId}/operators/${operatorId}?tab=3`}
-					>
+					<Breadcrumb.Link href={`/namespaces/${namespaceId}/operators/${operatorId}?tab=3`}>
 						Accounts
 					</Breadcrumb.Link>
 				</Breadcrumb.Item>
 				<Breadcrumb.Separator />
 				<Breadcrumb.Item>
-					<Breadcrumb.Link
-						href={`/namespaces/${namespaceId}/operators/${operatorId}/${accountId}`}
-					>
+					<Breadcrumb.Link href={`/namespaces/${namespaceId}/operators/${operatorId}/${accountId}`}>
 						{#if loading}
 							<Skeleton class="h-4 w-24" />
 						{:else}
@@ -142,7 +138,7 @@
 						</Card.Root>
 						<Card.Root>
 							<Card.Content class="p-6">
-								<h2 class="text-xl font-semibold sm:text-2xl mb-6">Credentials Issued</h2>
+								<h2 class="mb-6 text-xl font-semibold sm:text-2xl">Credentials Issued</h2>
 								{#if user}
 									<UserIssuancesTable {user} bind:api={issuancesApi} />
 								{/if}

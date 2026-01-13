@@ -17,18 +17,16 @@
 <section class="flex min-h-[60vh] items-center justify-center px-4">
 	<div class="text-center">
 		{#if heading}
-			<h1 class="text-7xl font-extrabold tracking-tight text-primary lg:text-9xl">
+			<h1 class="text-primary text-7xl font-extrabold tracking-tight lg:text-9xl">
 				{heading}
 			</h1>
 		{/if}
-		<p class="mb-4 text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+		<p class="text-foreground mb-4 text-3xl font-bold tracking-tight md:text-4xl">
 			{subheading}
 		</p>
-		<p class="mb-6 text-lg text-muted-foreground">
+		<p class="text-muted-foreground mb-6 text-lg">
 			{message}
 		</p>
-		<Button variant="destructive" size="lg" onclick={reloadHome}>
-			Back to Homepage
-		</Button>
+		<Button variant="destructive" size="lg" onclick={reloadHome}>Back to Homepage</Button>
 	</div>
 </section>

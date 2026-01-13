@@ -25,7 +25,7 @@
 					imports: account.limits.imports,
 					exports: account.limits.exports,
 					connections: account.limits.connections,
-					user_jwt_duration_secs: account.limits.user_jwt_duration_secs
+					user_jwt_duration_secs: account.limits.user_jwt_duration_secs,
 				}
 			: {}
 	);
@@ -39,7 +39,7 @@
 			loading = true;
 			account = await client.updateAccount(account.id, {
 				name: name,
-				limits: limits
+				limits: limits,
 			});
 			open = false;
 		} catch (e) {

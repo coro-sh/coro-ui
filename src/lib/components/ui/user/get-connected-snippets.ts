@@ -20,7 +20,7 @@ if err != nil {
 defer nc.Close()
 
 // Do something with the connection`,
-		language: go
+		language: go,
 	},
 	{
 		name: 'Python',
@@ -29,7 +29,7 @@ await nc.connect("nats://localhost:4222", user_credentials="path_to_creds")
 
 # Do something with the connection
 await nc.close()`,
-		language: python
+		language: python,
 	},
 	{
 		name: 'Java',
@@ -41,7 +41,7 @@ Connection nc = Nats.connect(options);
 
 // Do something with the connection
 nc.close();`,
-		language: java
+		language: java,
 	},
 	{
 		name: 'JavaScript',
@@ -50,6 +50,6 @@ const nc = await connect({
 	port: ns.port,
 	authenticator: authenticator,
 });`,
-		language: javascript
-	}
+		language: javascript,
+	},
 ];

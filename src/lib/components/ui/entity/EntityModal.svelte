@@ -23,7 +23,7 @@
 		modalType,
 		entityName = null,
 		onsubmit,
-		children
+		children,
 	}: Props = $props();
 
 	const title = $derived(

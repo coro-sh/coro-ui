@@ -10,7 +10,7 @@ export function showError(error: Error | string) {
 
 	toast.error(name, {
 		description: messages.join('\n'),
-		duration: 4000
+		duration: 4000,
 	});
 }
 

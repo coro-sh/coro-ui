@@ -116,7 +116,10 @@
 		<Breadcrumb.Root class="mb-8">
 			<Breadcrumb.List>
 				<Breadcrumb.Item>
-					<Breadcrumb.Link href={`/namespaces/${namespaceId}/operators`} class="flex items-center gap-2">
+					<Breadcrumb.Link
+						href={`/namespaces/${namespaceId}/operators`}
+						class="flex items-center gap-2"
+					>
 						<Home class="size-4" />
 						Operators
 					</Breadcrumb.Link>
@@ -159,29 +162,31 @@
 								{/each}
 							</div>
 						{:else if operator?.status.connected}
-							<div class="flex justify-between items-center mb-8">
+							<div class="mb-8 flex items-center justify-between">
 								<div class="flex items-center gap-2">
 									<h2 class="text-xl font-semibold sm:text-2xl">NATS Server</h2>
-									<Badge variant="success" class="flex items-center gap-1 mt-0.5">
+									<Badge variant="success" class="mt-0.5 flex items-center gap-1">
 										<Circle class="size-1.5! fill-current" />
 										Connected
 									</Badge>
 								</div>
 							</div>
 
-							<p class="mb-5 text-muted-foreground">Connected with the server config below.</p>
+							<p class="text-muted-foreground mb-5">Connected with the server config below.</p>
 
 							<CodeBlock loading={loadingNatsConfig} content={natsConfig} wrap />
 						{:else}
-							<div class="flex items-center justify-center gap-3 rounded-lg bg-muted/30 dark:bg-muted/50 p-4 mb-6 -mx-2 -mt-2">
-								<Badge variant="destructive" class="flex items-center gap-1 w-fit">
+							<div
+								class="bg-muted/30 dark:bg-muted/50 -mx-2 -mt-2 mb-6 flex items-center justify-center gap-3 rounded-lg p-4"
+							>
+								<Badge variant="destructive" class="flex w-fit items-center gap-1">
 									<Circle class="size-1.5! fill-current" />
 									Disconnected
 								</Badge>
-								<span class="text-sm text-foreground">NATS server not connected</span>
+								<span class="text-foreground text-sm">NATS server not connected</span>
 							</div>
 
-							<div class="flex justify-between items-center mb-4">
+							<div class="mb-4 flex items-center justify-between">
 								<h2 class="text-xl font-semibold sm:text-2xl">Connect a new NATS server</h2>
 							</div>
 
@@ -189,13 +194,23 @@
 								<!-- Step 1 -->
 								<div class="flex gap-4">
 									<div class="flex flex-col items-center">
-										<div class="flex size-8 items-center justify-center rounded-full bg-muted font-medium">1</div>
-										<div class="h-full w-px bg-border mt-2"></div>
+										<div
+											class="bg-muted flex size-8 items-center justify-center rounded-full font-medium"
+										>
+											1
+										</div>
+										<div class="bg-border mt-2 h-full w-px"></div>
 									</div>
 									<div class="flex-1 pb-8">
-										<h3 class="font-semibold mb-2">Server config</h3>
-										<p class="text-muted-foreground mb-4">Download the NATS server config for your Operator.</p>
-										<Button variant="outline" onclick={() => downloadFile(natsConfig, 'nats.conf')} class="mb-4">
+										<h3 class="mb-2 font-semibold">Server config</h3>
+										<p class="text-muted-foreground mb-4">
+											Download the NATS server config for your Operator.
+										</p>
+										<Button
+											variant="outline"
+											onclick={() => downloadFile(natsConfig, 'nats.conf')}
+											class="mb-4"
+										>
 											<Download class="size-4" />
 											Download Config
 										</Button>
@@ -207,12 +222,18 @@
 								<!-- Step 2 -->
 								<div class="flex gap-4">
 									<div class="flex flex-col items-center">
-										<div class="flex size-8 items-center justify-center rounded-full bg-muted font-medium">2</div>
-										<div class="h-full w-px bg-border mt-2"></div>
+										<div
+											class="bg-muted flex size-8 items-center justify-center rounded-full font-medium"
+										>
+											2
+										</div>
+										<div class="bg-border mt-2 h-full w-px"></div>
 									</div>
 									<div class="flex-1 pb-8">
-										<h3 class="font-semibold mb-2">Start the server</h3>
-										<p class="text-muted-foreground mb-4">Start your Operator NATS server using the saved config.</p>
+										<h3 class="mb-2 font-semibold">Start the server</h3>
+										<p class="text-muted-foreground mb-4">
+											Start your Operator NATS server using the saved config.
+										</p>
 										<CodeBlock loading={false} content="nats-server -c nats.conf" />
 									</div>
 								</div>
@@ -220,19 +241,27 @@
 								<!-- Step 3 -->
 								<div class="flex gap-4">
 									<div class="flex flex-col items-center">
-										<div class="flex size-8 items-center justify-center rounded-full bg-muted font-medium">3</div>
-										<div class="h-full w-px bg-border mt-2"></div>
+										<div
+											class="bg-muted flex size-8 items-center justify-center rounded-full font-medium"
+										>
+											3
+										</div>
+										<div class="bg-border mt-2 h-full w-px"></div>
 									</div>
 									<div class="flex-1 pb-8">
-										<h3 class="font-semibold mb-2">Proxy Agent token</h3>
+										<h3 class="mb-2 font-semibold">Proxy Agent token</h3>
 										<p class="text-muted-foreground mb-4">
-											Generate a new Proxy Agent authorization token. Please note that it cannot be retrieved again
-											later and must be regenerated if lost.
+											Generate a new Proxy Agent authorization token. Please note that it cannot be
+											retrieved again later and must be regenerated if lost.
 										</p>
 										{#if proxyToken}
 											<CodeBlock loading={false} content={proxyToken} />
 										{:else}
-											<Button onclick={generateProxyToken} class="min-w-52" disabled={loadingProxyToken}>
+											<Button
+												onclick={generateProxyToken}
+												class="min-w-52"
+												disabled={loadingProxyToken}
+											>
 												{#if loadingProxyToken}
 													<LoaderCircle class="size-4 animate-spin" />
 												{:else}
@@ -247,16 +276,25 @@
 								<!-- Step 4 -->
 								<div class="flex gap-4">
 									<div class="flex flex-col items-center">
-										<div class="flex size-8 items-center justify-center rounded-full bg-muted font-medium">4</div>
+										<div
+											class="bg-muted flex size-8 items-center justify-center rounded-full font-medium"
+										>
+											4
+										</div>
 									</div>
 									<div class="flex-1">
-										<h3 class="font-semibold mb-2">Run the Proxy Agent</h3>
+										<h3 class="mb-2 font-semibold">Run the Proxy Agent</h3>
 										<p class="text-muted-foreground mb-4">
-											The Coro Proxy Agent is a lightweight service that connects your Operator NATS server to Coro.
-											You can run the service as a Docker container using the latest Coro Proxy Agent image.
+											The Coro Proxy Agent is a lightweight service that connects your Operator NATS
+											server to Coro. You can run the service as a Docker container using the latest
+											Coro Proxy Agent image.
 										</p>
 										<CodeBlock loading={false} content={proxyAgentCmd} />
-										<Button class="mt-5 min-w-44" onclick={testNATSConnection} disabled={loadingTestConnection}>
+										<Button
+											class="mt-5 min-w-44"
+											onclick={testNATSConnection}
+											disabled={loadingTestConnection}
+										>
 											{#if loadingTestConnection}
 												<LoaderCircle class="size-4 animate-spin" />
 											{:else}

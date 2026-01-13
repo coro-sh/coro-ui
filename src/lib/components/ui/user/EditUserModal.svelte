@@ -23,7 +23,7 @@
 			? {
 					subscriptions: user.limits.subscriptions,
 					payload_size: user.limits.payload_size,
-					jwt_duration_secs: user.limits.jwt_duration_secs
+					jwt_duration_secs: user.limits.jwt_duration_secs,
 				}
 			: {}
 	);
@@ -37,7 +37,7 @@
 			loading = true;
 			user = await client.updateUser(user.id, {
 				name: name,
-				limits: limits
+				limits: limits,
 			});
 			open = false;
 		} catch (e) {

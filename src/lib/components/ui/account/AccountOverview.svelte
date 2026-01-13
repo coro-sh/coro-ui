@@ -24,7 +24,7 @@
 		'Imports',
 		'Exports',
 		'Connections',
-		'User JWT Lifetime'
+		'User JWT Lifetime',
 	] as const;
 
 	const accountData = $derived.by(() => {

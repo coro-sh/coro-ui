@@ -5,7 +5,7 @@ export function newError(name: string, message?: string): Error {
 }
 
 export function newDetailsError(name: string, details: string[]): Error {
-	return  newError(name, details.join(';'));
+	return newError(name, details.join(';'));
 }
 
 export function newResponseError(status: number, statusText: string): Error {
@@ -26,7 +26,6 @@ export function newUnsupportedResponseContentTypeError(contentType: string): Err
 export function newUnexpectedNoContentResponse(status: number): Error {
 	return newError('Bad Response', `Expected no content 204 status but received: ${status}`);
 }
-
 
 export function newNetworkError(error: unknown): Error {
 	const parsed = toError(error);

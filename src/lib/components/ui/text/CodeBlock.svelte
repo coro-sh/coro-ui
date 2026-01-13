@@ -39,16 +39,16 @@
 
 <div
 	class={cn(
-		'code-block relative rounded-md p-4 flex flex-col overflow-hidden max-w-full bg-zinc-900 border border-zinc-700',
+		'code-block relative flex max-w-full flex-col overflow-hidden rounded-md border border-zinc-700 bg-zinc-900 p-4',
 		className
 	)}
 >
-	<div class="absolute top-0 right-0 z-10 p-2 bg-zinc-900">
+	<div class="absolute top-0 right-0 z-10 bg-zinc-900 p-2">
 		<Button
 			variant="outline"
 			size="icon"
 			class={cn(
-				'size-8 border-zinc-700 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200',
+				'size-8 border-zinc-700 bg-zinc-900 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200',
 				copied && 'border-green-500 bg-green-500/10'
 			)}
 			onclick={copyToClipboard}
@@ -62,11 +62,11 @@
 		</Button>
 	</div>
 
-	<div class={cn('relative min-w-0', !wrap && 'overflow-x-auto mr-10')}>
+	<div class={cn('relative min-w-0', !wrap && 'mr-10 overflow-x-auto')}>
 		<div
 			class={cn(
-				'text-xs font-mono text-zinc-200',
-				wrap ? 'whitespace-pre-wrap break-all pr-10' : 'whitespace-pre',
+				'font-mono text-xs text-zinc-200',
+				wrap ? 'pr-10 break-all whitespace-pre-wrap' : 'whitespace-pre',
 				exceedsLimit && !expanded ? 'max-h-[300px] overflow-hidden' : '',
 				exceedsLimit ? 'pb-12' : ''
 			)}
@@ -86,7 +86,7 @@
 
 		{#if exceedsLimit && !loading}
 			<div
-				class="absolute bottom-0 left-0 w-full flex flex-col items-center pt-8 bg-gradient-to-t from-zinc-900"
+				class="absolute bottom-0 left-0 flex w-full flex-col items-center bg-gradient-to-t from-zinc-900 pt-8"
 			>
 				{#if !expanded}
 					<Button variant="outline" size="sm" onclick={() => (expanded = true)}>

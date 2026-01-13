@@ -21,7 +21,7 @@
 		users,
 		hasMore = $bindable(false),
 		loadingMore = $bindable(false),
-		onloadmore
+		onloadmore,
 	}: Props = $props();
 
 	const columns = ['ID', 'Name', 'Public Key', ''];

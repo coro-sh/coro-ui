@@ -86,9 +86,9 @@
 	}
 </script>
 
-<div class="overflow-x-auto max-h-[580px] overflow-y-auto">
+<div class="max-h-[580px] overflow-x-auto overflow-y-auto">
 	<Table.Root>
-		<Table.Header class="sticky top-0 bg-muted">
+		<Table.Header class="bg-muted sticky top-0">
 			<Table.Row>
 				{#each columns as title}
 					<Table.Head class="font-medium whitespace-nowrap">{title}</Table.Head>
@@ -107,7 +107,7 @@
 			{:else if !issuances.length}
 				<Table.Row>
 					<Table.Cell colspan={columns.length}>
-						<div class="text-center text-muted-foreground my-20">
+						<div class="text-muted-foreground my-20 text-center">
 							<p>No credentials issued</p>
 						</div>
 					</Table.Cell>

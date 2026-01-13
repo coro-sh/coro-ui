@@ -96,8 +96,8 @@
 			</Breadcrumb.List>
 		</Breadcrumb.Root>
 
-		<div class="flex items-center justify-between mb-5">
-			<h1 class="text-3xl font-bold text-foreground">Operators</h1>
+		<div class="mb-5 flex items-center justify-between">
+			<h1 class="text-foreground text-3xl font-bold">Operators</h1>
 			<Button onclick={handleCreateOperator}>
 				<Plus class="size-4" />
 				Create Operator
@@ -107,15 +107,15 @@
 		<div class="mt-px space-y-4">
 			{#if !loading && !operators.length}
 				<!-- Empty state -->
-				<div class="flex items-center justify-center h-96">
+				<div class="flex h-96 items-center justify-center">
 					<Card.Root class="w-full max-w-2xl">
 						<Card.Content class="pt-6">
-							<div class="flex items-center justify-center mb-3">
+							<div class="mb-3 flex items-center justify-center">
 								<FolderOpen class="text-muted-foreground size-12" />
 							</div>
-							<div class="text-center text-muted-foreground">
-								<p class="text-2xl font-medium mb-2 text-foreground">No Operators found</p>
-								<p class="text-base mb-5">Get started by creating a new Operator</p>
+							<div class="text-muted-foreground text-center">
+								<p class="text-foreground mb-2 text-2xl font-medium">No Operators found</p>
+								<p class="mb-5 text-base">Get started by creating a new Operator</p>
 								<Button variant="outline" onclick={handleCreateOperator}>
 									<Plus class="size-4" />
 									Create Operator
@@ -126,10 +126,10 @@
 				</div>
 			{:else if loading && !operators.length}
 				<!-- Loading skeleton -->
-				<div class="grid grid-cols-1 gap-4 xl:grid-cols-3 mb-2">
+				<div class="mb-2 grid grid-cols-1 gap-4 xl:grid-cols-3">
 					{#each { length: 3 } as _}
 						<Card.Root>
-							<Card.Content class="pt-6 space-y-4">
+							<Card.Content class="space-y-4 pt-6">
 								<Skeleton class="h-6 w-32" />
 								<Skeleton class="h-4 w-full" />
 								<Skeleton class="h-4 w-3/4" />
@@ -140,18 +140,16 @@
 				</div>
 			{:else}
 				<!-- Operators grid -->
-				<div class="grid gap-4 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 mb-2">
+				<div class="mb-2 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
 					{#each operators as operator (operator.id)}
 						<a
 							href={`/namespaces/${namespaceStore.activeId}/operators/${operator.id}`}
 							class="block"
 						>
-							<Card.Root
-								class="relative hover:bg-accent/50 transition-colors"
-							>
+							<Card.Root class="hover:bg-accent/50 relative transition-colors">
 								<Card.Content class="pt-6">
 									<div class="flex items-center justify-between">
-										<h3 class="text-2xl font-semibold text-foreground truncate pr-8 -mt-6.5">
+										<h3 class="text-foreground -mt-6.5 truncate pr-8 text-2xl font-semibold">
 											{operator.name}
 										</h3>
 										<div class="absolute top-4 right-4">
@@ -167,7 +165,7 @@
 											NATS {operator.status.connected ? 'Connected' : 'Disconnected'}
 										</Badge>
 										{#if operator.status.connected && operator.status.connect_time}
-											<span class="text-xs text-muted-foreground">
+											<span class="text-muted-foreground text-xs">
 												{formatEpoch(operator.status.connect_time)}
 											</span>
 										{/if}

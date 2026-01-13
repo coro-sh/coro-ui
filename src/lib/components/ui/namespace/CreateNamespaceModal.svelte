@@ -39,7 +39,13 @@
 	}
 </script>
 
-<EntityModal bind:open bind:loading entityType="namespace" modalType="create" onsubmit={handleSubmit}>
+<EntityModal
+	bind:open
+	bind:loading
+	entityType="namespace"
+	modalType="create"
+	onsubmit={handleSubmit}
+>
 	<div class="col-span-2 space-y-2">
 		<Label for="name">Name</Label>
 		<Input bind:value={name} id="name" name="name" placeholder="Type namespace name" required />

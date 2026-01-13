@@ -30,11 +30,11 @@
 		limits = null,
 		copyableFields = [],
 		jwt = null,
-		deleteCallback
+		deleteCallback,
 	}: Props = $props();
 </script>
 
-<div class="flex justify-between items-center mb-8">
+<div class="mb-8 flex items-center justify-between">
 	<h2 class="text-xl font-semibold sm:text-2xl">Overview</h2>
 
 	<div class="flex gap-2">
@@ -48,18 +48,21 @@
 	</div>
 </div>
 
-<div class="grid lg:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-8">
-	<h3 class="text-md font-semibold col-span-full">{name || 'General'}</h3>
+<div class="grid gap-x-6 gap-y-8 lg:grid-cols-2 xl:grid-cols-3">
+	<h3 class="text-md col-span-full font-semibold">{name || 'General'}</h3>
 
 	{#each data.entries() as [title, value]}
 		<div>
-			<h4 class="mb-2 text-sm font-bold text-muted-foreground">{title}</h4>
+			<h4 class="text-muted-foreground mb-2 text-sm font-bold">{title}</h4>
 			{#if loading}
-				<Skeleton class="h-4 w-24 mt-2" />
+				<Skeleton class="mt-2 h-4 w-24" />
 			{:else if copyableFields.includes(title)}
 				<CopyableText spanId={String(value)} text={String(value ?? '')} class="text-sm" />
 			{:else if title === 'NATS Status'}
-				<Badge variant={value === 'Connected' ? 'success' : 'destructive'} class="flex items-center gap-1 w-fit">
+				<Badge
+					variant={value === 'Connected' ? 'success' : 'destructive'}
+					class="flex w-fit items-center gap-1"
+				>
 					<Circle class="size-1.5! fill-current" />
 					{value || 'Unknown'}
 				</Badge>
@@ -71,13 +74,13 @@
 
 	{#if limits}
 		<Separator class="col-span-full" />
-		<h3 class="text-md font-semibold col-span-full">Limits</h3>
+		<h3 class="text-md col-span-full font-semibold">Limits</h3>
 
 		{#each limits.entries() as [title, value]}
 			<div>
-				<h4 class="mb-2 text-sm font-bold text-muted-foreground">{title}</h4>
+				<h4 class="text-muted-foreground mb-2 text-sm font-bold">{title}</h4>
 				{#if loading}
-					<Skeleton class="h-4 w-24 mt-2" />
+					<Skeleton class="mt-2 h-4 w-24" />
 				{:else}
 					<p class="text-sm">{value || 'Unlimited'}</p>
 				{/if}

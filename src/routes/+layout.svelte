@@ -86,9 +86,7 @@
 
 <ModeWatcher defaultMode="dark" />
 
-<header
-	class="bg-background fixed top-0 z-40 mx-auto w-full flex-none border-b"
->
+<header class="bg-background fixed top-0 z-40 mx-auto w-full flex-none border-b">
 	<div class={mxClass}>
 		<nav class="flex h-14 items-center justify-between px-4">
 			<div class="flex items-center gap-4">
@@ -122,9 +120,7 @@
 							<DropdownMenu.Separator />
 							{#each namespaceStore.namespaces as namespace (namespace.id)}
 								<DropdownMenu.Sub>
-									<DropdownMenu.SubTrigger
-										onclick={() => updateActiveNamespace(namespace.id)}
-									>
+									<DropdownMenu.SubTrigger onclick={() => updateActiveNamespace(namespace.id)}>
 										{#if namespaceStore.activeId === namespace.id}
 											<Check class="size-4" />
 										{/if}

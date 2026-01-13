@@ -6,7 +6,7 @@ import {
 	newResponseError,
 	newUnexpectedNoContentResponse,
 	newUnsupportedResponseContentTypeError,
-	newUnsupportedResponseError
+	newUnsupportedResponseError,
 } from '$lib/error';
 
 export class Client {
