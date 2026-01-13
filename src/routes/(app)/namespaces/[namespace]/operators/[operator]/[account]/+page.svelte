@@ -1,34 +1,36 @@
 <script lang="ts">
-	import UsersTable from '$lib/components/user/UsersTable.svelte';
-	import AccountOverview from '$lib/components/account/AccountOverview.svelte';
+	import { Skeleton } from '$lib/components/ui/skeleton';
+	import UsersTable from '$lib/components/ui/user/UsersTable.svelte';
+	import AccountOverview from '$lib/components/ui/account/AccountOverview.svelte';
+	import TabGroup from '$lib/components/ui/tab/TabGroup.svelte';
+	import TabCard from '$lib/components/ui/tab/TabCard.svelte';
+	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
+	import CreateUserModal from '$lib/components/ui/user/CreateUserModal.svelte';
+	import ErrorLoadResourceSection from '$lib/components/ui/error/ErrorLoadResourceSection.svelte';
 	import { onMount } from 'svelte';
-	import { page } from '$app/stores';
-	import type { AccountResponse, OperatorResponse, UserResponse } from '$lib/models/entity';
-	import TabGroup from '$lib/components/tab/TabGroup.svelte';
-	import TabCard from '$lib/components/tab/TabCard.svelte';
-	import CreateUserModal from '$lib/components/user/CreateUserModal.svelte';
 	import { CoroClient } from '$lib/coro-client';
-	import Breadcrumb from '$lib/components/breacrumb/Breadcrumb.svelte';
-	import BreadcrumbItem from '$lib/components/breacrumb/BreadcrumbItem.svelte';
-	import PlaceholderLine from '$lib/components/text/PlaceholderLine.svelte';
-	import ErrorLoadResourceSection from '$lib/components/error/ErrorLoadResourceSection.svelte';
-	import { activeNamespaceId } from '$lib/stores/namespace';
-	import { showErrorToast } from '$lib/stores/toast';
+	import type { AccountResponse, OperatorResponse, UserResponse } from '$lib/models/entity';
+	import { page } from '$app/state';
+	import { namespaceStore } from '$lib/stores/namespace.svelte';
+	import { showError } from '$lib/stores/toast';
 
-	const operatorId = $page.params.operator;
-	const accountId = $page.params.account;
+	import Home from '@lucide/svelte/icons/home';
 
-	let loading = true;
-	let loadingMoreUsers = false;
-	let loadFailed = false;
-	let openCreateUser = false;
-	let operator: OperatorResponse;
-	let account: AccountResponse;
-	let users: UserResponse[] = [];
-	let hasMoreUsers = false;
+	const namespaceId = $derived(page.params.namespace ?? '');
+	const operatorId = $derived(page.params.operator ?? '');
+	const accountId = $derived(page.params.account ?? '');
+
+	let loading = $state(true);
+	let loadingMoreUsers = $state(false);
+	let loadFailed = $state(false);
+	let openCreateUser = $state(false);
+	let operator = $state<OperatorResponse | undefined>(undefined);
+	let account = $state<AccountResponse | undefined>(undefined);
+	let users = $state<UserResponse[]>([]);
+	let hasMoreUsers = $state(false);
 
 	const client = new CoroClient();
-	const paginator = client.paginateUsers(accountId);
+	const paginator = $derived(client.paginateUsers(accountId));
 
 	onMount(async () => {
 		loading = true;
@@ -37,7 +39,7 @@
 			account = await client.fetchAccount(accountId);
 			await fetchNextUsersPage();
 		} catch (e) {
-			showErrorToast(e);
+			showError(e as Error);
 			loadFailed = true;
 		} finally {
 			loading = false;
@@ -47,11 +49,11 @@
 	async function fetchNextUsersPage() {
 		loadingMoreUsers = true;
 		try {
-			const page = await paginator.fetchNext();
-			users = [...users, ...page];
+			const pageData = await paginator.fetchNext();
+			users = [...users, ...pageData];
 			hasMoreUsers = paginator.hasNext();
 		} catch (e) {
-			showErrorToast(e);
+			showError(e as Error);
 		} finally {
 			loadingMoreUsers = false;
 		}
@@ -62,41 +64,82 @@
 	{#if loadFailed}
 		<ErrorLoadResourceSection />
 	{:else}
-		<Breadcrumb marginBot={8}>
-			<BreadcrumbItem {loading}
-											href="/namespaces/{$activeNamespaceId}/operators/{operatorId}">{operator?.name}</BreadcrumbItem>
-			<BreadcrumbItem href="/namespaces/{$activeNamespaceId}/operators/{operatorId}?tab=3">Accounts</BreadcrumbItem>
-			<BreadcrumbItem {loading}
-											href="/namespaces/{$activeNamespaceId}/operators/{operatorId}/{accountId}">{account?.name}</BreadcrumbItem>
-		</Breadcrumb>
+		<Breadcrumb.Root class="mb-8">
+			<Breadcrumb.List>
+				<Breadcrumb.Item>
+					<Breadcrumb.Link
+						href={`/namespaces/${namespaceId}/operators`}
+						class="flex items-center gap-2"
+					>
+						<Home class="size-4" />
+						Operators
+					</Breadcrumb.Link>
+				</Breadcrumb.Item>
+				<Breadcrumb.Separator />
+				<Breadcrumb.Item>
+					<Breadcrumb.Link href={`/namespaces/${namespaceId}/operators/${operatorId}`}>
+						{#if loading}
+							<Skeleton class="h-4 w-24" />
+						{:else}
+							{operator?.name}
+						{/if}
+					</Breadcrumb.Link>
+				</Breadcrumb.Item>
+				<Breadcrumb.Separator />
+				<Breadcrumb.Item>
+					<Breadcrumb.Link href={`/namespaces/${namespaceId}/operators/${operatorId}?tab=3`}>
+						Accounts
+					</Breadcrumb.Link>
+				</Breadcrumb.Item>
+				<Breadcrumb.Separator />
+				<Breadcrumb.Item>
+					<Breadcrumb.Page>
+						{#if loading}
+							<Skeleton class="h-4 w-24" />
+						{:else}
+							{account?.name}
+						{/if}
+					</Breadcrumb.Page>
+				</Breadcrumb.Item>
+			</Breadcrumb.List>
+		</Breadcrumb.Root>
 
-		<div class="mb-3 items-center">
-			<span class="text-3xl font-bold leading-none text-light-base dark:text-dark-base">
-				{#if loading}
-					<div class="mt-10 mb-10">
-						<PlaceholderLine width="2/12" />
-					</div>
-				{:else}
-					{account?.name}
-				{/if}
-			</span>
+		<div class="mb-6">
+			{#if loading}
+				<Skeleton class="h-9 w-48" />
+			{:else}
+				<h1 class="text-3xl font-bold">{account?.name}</h1>
+			{/if}
 		</div>
 
 		<TabGroup tabNames={['Overview', 'Users']}>
-			<div slot="1">
-				<TabCard>
-					<AccountOverview bind:loading bind:account />
-				</TabCard>
-			</div>
-			<div slot="2">
-				<TabCard>
-					<UsersTable bind:loading bind:openCreateModal={openCreateUser} bind:hasMore={hasMoreUsers}
-											bind:loadingMore={loadingMoreUsers} users={users}
-											on:loadMore={fetchNextUsersPage} />
-				</TabCard>
-			</div>
+			{#snippet children(tab)}
+				{#if tab === 1}
+					<TabCard>
+						{#if account}
+							<AccountOverview bind:loading bind:account />
+						{/if}
+					</TabCard>
+				{:else if tab === 2}
+					<TabCard>
+						<UsersTable
+							bind:loading
+							bind:openCreateModal={openCreateUser}
+							bind:hasMore={hasMoreUsers}
+							bind:loadingMore={loadingMoreUsers}
+							{users}
+							onloadmore={fetchNextUsersPage}
+						/>
+					</TabCard>
+				{/if}
+			{/snippet}
 		</TabGroup>
 	{/if}
 </main>
 
-<CreateUserModal bind:users bind:open={openCreateUser} accountId={account?.id ?? ''} />
+<CreateUserModal
+	bind:users
+	bind:open={openCreateUser}
+	accountId={account?.id ?? ''}
+	accountUserJWTLifetime={account?.limits.user_jwt_duration_secs}
+/>

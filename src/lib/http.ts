@@ -6,7 +6,7 @@ import {
 	newResponseError,
 	newUnexpectedNoContentResponse,
 	newUnsupportedResponseContentTypeError,
-	newUnsupportedResponseError
+	newUnsupportedResponseError,
 } from '$lib/error';
 
 export class Client {
@@ -102,8 +102,17 @@ export class Client {
 
 	private async fetch(path: string, options: RequestInit): Promise<globalThis.Response> {
 		const url = `${this.baseURL}${path}`;
+		const mergedOptions: RequestInit = {
+			credentials: 'include',
+			headers: {
+				Accept: 'application/json, text/plain;q=0.9, */*;q=0.8',
+				...(options.headers ?? {}),
+			},
+			...options,
+		};
+
 		try {
-			return await fetch(url, options);
+			return await fetch(url, mergedOptions);
 		} catch (error) {
 			throw newNetworkError(error);
 		}

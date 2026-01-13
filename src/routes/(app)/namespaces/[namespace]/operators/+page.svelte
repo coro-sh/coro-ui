@@ -1,25 +1,51 @@
 <script lang="ts">
-	import { Badge, Button, Card, Heading, Indicator, Spinner } from 'flowbite-svelte';
-	import { FolderOpenSolid, PlusOutline } from 'flowbite-svelte-icons';
-	import CreateOperatorModal from '$lib/components/operator/CreateOperatorModal.svelte';
-	import More from '$lib/components/nav/More.svelte';
-	import type { OperatorResponse } from '$lib/models/entity';
+	import { Button } from '$lib/components/ui/button';
+	import * as Card from '$lib/components/ui/card';
+	import { Badge } from '$lib/components/ui/badge';
+	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
+	import { Skeleton } from '$lib/components/ui/skeleton';
+	import More from '$lib/components/ui/nav/More.svelte';
+	import ErrorLoadResourceSection from '$lib/components/ui/error/ErrorLoadResourceSection.svelte';
+	import { namespaceStore } from '$lib/stores/namespace.svelte';
+	import { showError } from '$lib/stores/toast';
+	import { CoroClient, type Paginator } from '$lib/coro-client';
+	import { formatEpoch } from '$lib/utils';
 	import { onMount } from 'svelte';
-	import { CoroClient } from '$lib/coro-client';
-	import Breadcrumb from '$lib/components/breacrumb/Breadcrumb.svelte';
-	import PlaceholderBlock from '$lib/components/text/PlaceholderBlock.svelte';
-	import ErrorLoadResourceSection from '$lib/components/error/ErrorLoadResourceSection.svelte';
-	import { activeNamespaceId } from '$lib/stores/namespace';
-	import { formatEpoch } from '$lib/util';
-	import { showErrorToast } from '$lib/stores/toast';
+	import { page } from '$app/state';
+	import type { OperatorResponse } from '$lib/models/entity';
 
-	let loading = true;
-	let loadFailed = false;
-	let openCreateOperatorModal: boolean;
-	let operators: OperatorResponse[] = [];
-	let hasMore = false;
+	import FolderOpen from '@lucide/svelte/icons/folder-open';
+	import Plus from '@lucide/svelte/icons/plus';
+	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
+	import Home from '@lucide/svelte/icons/home';
+	import Circle from '@lucide/svelte/icons/circle';
+
+	import CreateOperatorModal from '$lib/components/ui/operator/CreateOperatorModal.svelte';
+
+	let loading = $state(true);
+	let loadFailed = $state(false);
+	let openCreateOperatorModal = $state(false);
+	let operators = $state<OperatorResponse[]>([]);
+	let hasMore = $state(false);
+
+	const columns = 3;
+	const defaultPageSize = 60;
+
+	const client = new CoroClient();
+	let paginator: Paginator<OperatorResponse>;
+
+	// Get namespace ID from URL params
+	const namespaceId = $derived(page.params.namespace);
 
 	onMount(async () => {
+		// Ensure namespace is set in store
+		if (namespaceId) {
+			namespaceStore.setActiveId(namespaceId);
+		}
+
+		// Create paginator after namespace is available
+		paginator = client.paginateOperators(defaultPageSize);
+
 		try {
 			await fetchNextPage();
 		} catch {
@@ -27,18 +53,15 @@
 		}
 	});
 
-	const columns = 3;
-	const defaultPageSize = 60;
-
-	$: if (operators) {
-		const remainder = operators.length % columns;
-		if (remainder > 0) {
-			paginator.size = defaultPageSize + columns - remainder;
+	// Adjust page size to fill grid evenly
+	$effect(() => {
+		if (operators.length > 0) {
+			const remainder = operators.length % columns;
+			if (remainder > 0) {
+				paginator.size = defaultPageSize + columns - remainder;
+			}
 		}
-	}
-
-	const client = new CoroClient();
-	const paginator = client.paginateOperators(defaultPageSize);
+	});
 
 	async function fetchNextPage() {
 		loading = true;
@@ -47,10 +70,14 @@
 			operators = [...operators, ...page];
 			hasMore = paginator.hasNext();
 		} catch (e) {
-			showErrorToast(e);
+			showError(e as Error);
 		} finally {
 			loading = false;
 		}
+	}
+
+	function handleCreateOperator() {
+		openCreateOperatorModal = true;
 	}
 </script>
 
@@ -58,94 +85,108 @@
 	{#if loadFailed}
 		<ErrorLoadResourceSection />
 	{:else}
-		<Breadcrumb marginBot={5} />
+		<Breadcrumb.Root class="mb-5">
+			<Breadcrumb.List>
+				<Breadcrumb.Item>
+					<Breadcrumb.Link href="/" class="flex items-center gap-2">
+						<Home class="size-4" />
+						Operators
+					</Breadcrumb.Link>
+				</Breadcrumb.Item>
+			</Breadcrumb.List>
+		</Breadcrumb.Root>
 
-		<div class="flex items-center justify-between mb-5">
-			<span class="-mb-2.5 text-3xl font-bold leading-none text-light-base dark:text-dark-base">Operators</span>
-			<Button on:click={() => { openCreateOperatorModal = true }}
-							size="md"
-							class="gap-2 whitespace-nowrap px-3">
-				<PlusOutline size="md" />
+		<div class="mb-5 flex items-center justify-between">
+			<h1 class="text-foreground text-3xl font-bold">Operators</h1>
+			<Button onclick={handleCreateOperator}>
+				<Plus class="size-4" />
 				Create Operator
 			</Button>
 		</div>
 
 		<div class="mt-px space-y-4">
-			{#if !loading && !operators.length }
-				<div class="flex items-center justify-center h-96">
-					<Card class="w-full max-w-2xl shadow-none dark:bg-dark-content border-light-border dark:border-dark-border">
-						<div class="m-5">
-							<div class="flex items-center justify-center mb-3">
-								<FolderOpenSolid class="text-mono-600 dark:text-mono-400 size-12" />
+			{#if !loading && !operators.length}
+				<!-- Empty state -->
+				<div class="flex h-96 items-center justify-center">
+					<Card.Root class="w-full max-w-2xl">
+						<Card.Content class="pt-6">
+							<div class="mb-3 flex items-center justify-center">
+								<FolderOpen class="text-muted-foreground size-12" />
 							</div>
-							<div class="text-center text-light-alt dark:text-dark-alt">
-								<p class="text-2xl font-medium mb-2">No Operators found</p>
-								<p class="text-base mb-5">Get started by creating a new Operator</p>
-								<Button color="alternative" on:click={() => {openCreateOperatorModal = true}}
-												size="md"
-												class="gap-2 whitespace-nowrap px-3">
-									<PlusOutline size="md" />
+							<div class="text-muted-foreground text-center">
+								<p class="text-foreground mb-2 text-2xl font-medium">No Operators found</p>
+								<p class="mb-5 text-base">Get started by creating a new Operator</p>
+								<Button variant="outline" onclick={handleCreateOperator}>
+									<Plus class="size-4" />
 									Create Operator
 								</Button>
 							</div>
-						</div>
-					</Card>
+						</Card.Content>
+					</Card.Root>
 				</div>
 			{:else if loading && !operators.length}
-				<div class="grid grid-cols-1 gap-4 xl:grid-cols-3 mb-2">
+				<!-- Loading skeleton -->
+				<div class="mb-2 grid grid-cols-1 gap-4 xl:grid-cols-3">
 					{#each { length: 3 } as _}
-						<Card size="xl"
-									class="shadow-sm max-w-none dark:bg-dark-content border-light-border dark:border-dark-border">
-							<PlaceholderBlock lines={4} />
-						</Card>
+						<Card.Root>
+							<Card.Content class="space-y-4 pt-6">
+								<Skeleton class="h-6 w-32" />
+								<Skeleton class="h-4 w-full" />
+								<Skeleton class="h-4 w-3/4" />
+								<Skeleton class="h-6 w-24" />
+							</Card.Content>
+						</Card.Root>
 					{/each}
 				</div>
 			{:else}
-				<div class="grid gap-4 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 mb-2">
-					{#each operators as operator}
-						<a href={`/namespaces/${$activeNamespaceId}/operators/${operator.id}`} class="block">
-							<Card
-								size="xl"
-								class="relative shadow-sm max-w-none bg-light-content hover:bg-light-contentHover dark:bg-dark-content dark:hover:bg-dark-contentHover border-light-border dark:border-dark-border p-4 sm:p-6"
-							>
-								<div class="flex items-center justify-between">
-									<Heading tag="h3" class="text-2xl font-semibold text-light-base dark:text-dark-base">
-										{operator.name}
-									</Heading>
-									<div class="absolute top-4 sm:top-5 right-4">
-										<More />
+				<!-- Operators grid -->
+				<div class="mb-2 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+					{#each operators as operator (operator.id)}
+						<a
+							href={`/namespaces/${namespaceStore.activeId}/operators/${operator.id}`}
+							class="block"
+						>
+							<Card.Root class="hover:bg-accent/50 relative transition-colors">
+								<Card.Content class="pt-6">
+									<div class="flex items-center justify-between">
+										<h3 class="text-foreground -mt-6.5 truncate pr-8 text-2xl font-semibold">
+											{operator.name}
+										</h3>
+										<div class="absolute top-4 right-4">
+											<More />
+										</div>
 									</div>
-								</div>
-								<div class="mt-5 flex pt-3">
-									<Badge
-										color={operator.status.connected ? 'green' : 'red'}
-										rounded
-										class="px-2.5 py-1 flex items-center"
-									>
-										<Indicator color={operator.status.connected ? 'green' : 'red'} size="xs" class="me-1" />
-										<p class="text-sm/4"> NATS {operator.status.connected ? 'Connected' : 'Disconnected'}</p>
-									</Badge>
-									{#if operator.status.connected && operator.status.connect_time}
-        <span class="flex ml-2 mt-1 text-xs text-light-base dark:text-dark-base break-words overflow-hidden">
-          {formatEpoch(operator.status.connect_time)}
-        </span>
-									{/if}
-								</div>
-							</Card>
+									<div class="mt-5 flex items-center gap-2 pt-3">
+										<Badge
+											variant={operator.status.connected ? 'success' : 'destructive'}
+											class="flex items-center gap-1"
+										>
+											<Circle class="size-1.5! fill-current" />
+											NATS {operator.status.connected ? 'Connected' : 'Disconnected'}
+										</Badge>
+										{#if operator.status.connected && operator.status.connect_time}
+											<span class="text-muted-foreground text-xs">
+												{formatEpoch(operator.status.connect_time)}
+											</span>
+										{/if}
+									</div>
+								</Card.Content>
+							</Card.Root>
 						</a>
 					{/each}
-					{#if hasMore}
-						<div class="col-span-3 flex justify-center">
-							<Button size="sm" on:click={fetchNextPage}>
-								{#if loading}
-									<Spinner size={4} color="gray" />
-								{:else}
-									Load More
-								{/if}
-							</Button>
-						</div>
-					{/if}
 				</div>
+
+				{#if hasMore}
+					<div class="col-span-3 flex justify-center">
+						<Button variant="outline" size="sm" onclick={fetchNextPage} disabled={loading}>
+							{#if loading}
+								<LoaderCircle class="size-4 animate-spin" />
+							{:else}
+								Load More
+							{/if}
+						</Button>
+					</div>
+				{/if}
 			{/if}
 		</div>
 	{/if}

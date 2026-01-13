@@ -5,15 +5,14 @@ export function newError(name: string, message?: string): Error {
 }
 
 export function newDetailsError(name: string, details: string[]): Error {
-	const err = new Error(details.join(';'));
-	err.name = name;
-	return err;
+	return newError(name, details.join(';'));
 }
 
 export function newResponseError(status: number, statusText: string): Error {
-	const err = new Error(`${status} ${statusText}`);
-	err.name = 'Error Response';
-	return err;
+	if (status === 401) {
+		return new UnauthorizedError(`${status} ${statusText}`);
+	}
+	return newError('Error Response', `${status} ${statusText}`);
 }
 
 export function newUnsupportedResponseError(): Error {
@@ -27,7 +26,6 @@ export function newUnsupportedResponseContentTypeError(contentType: string): Err
 export function newUnexpectedNoContentResponse(status: number): Error {
 	return newError('Bad Response', `Expected no content 204 status but received: ${status}`);
 }
-
 
 export function newNetworkError(error: unknown): Error {
 	const parsed = toError(error);
@@ -54,5 +52,12 @@ export function toError(error: unknown): Error {
 		return newUnexpectedError(error);
 	} else {
 		return newUnknownError();
+	}
+}
+
+export class UnauthorizedError extends Error {
+	constructor(message: string) {
+		super(message);
+		this.name = 'Unauthorized';
 	}
 }

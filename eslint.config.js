@@ -1,39 +1,48 @@
 import js from '@eslint/js';
 import ts from 'typescript-eslint';
 import svelte from 'eslint-plugin-svelte';
-import prettier from 'eslint-config-prettier';
 import globals from 'globals';
 
 /** @type {import('eslint').Linter.FlatConfig[]} */
 export default [
+	// Ignores
+	{
+		ignores: ['build/', '.svelte-kit/', 'dist/', '**/*.svelte.ts'],
+	},
+
+	// Base configs
 	js.configs.recommended,
 	...ts.configs.recommended,
 	...svelte.configs['flat/recommended'],
-	prettier,
-	...svelte.configs['flat/prettier'],
+
+	// Globals
 	{
 		languageOptions: {
 			globals: {
 				...globals.browser,
-				...globals.node
-			}
-		}
+				...globals.node,
+			},
+		},
 	},
+
+	// Svelte: parse <script> with TS
 	{
 		files: ['**/*.svelte'],
 		languageOptions: {
 			parserOptions: {
-				parser: ts.parser
-			}
-		}
+				parser: ts.parser,
+			},
+		},
 	},
-	{
-		ignores: ['build/', '.svelte-kit/', 'dist/']
-	},
+
+	// Overrides
 	{
 		rules: {
-			"@typescript-eslint/no-explicit-any": "off",
-			"prefer-const": ["error", { "ignoreReadBeforeAssign": true }]
-		}
-	}
+			'@typescript-eslint/no-explicit-any': 'off',
+			'prefer-const': ['error', { ignoreReadBeforeAssign: true }],
+		},
+	},
+
+	// Disable formatting rules that conflict with Prettier
+	...svelte.configs['flat/prettier'],
 ];

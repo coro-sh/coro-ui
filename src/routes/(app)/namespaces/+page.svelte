@@ -1,9 +1,11 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
-	import { activeNamespaceId } from '$lib/stores/namespace';
+	import { namespaceStore } from '$lib/stores/namespace.svelte';
 
 	onMount(() => {
-		goto(`/namespaces/${$activeNamespaceId}/operators`);
+		if (namespaceStore.activeId) {
+			goto(`/namespaces/${namespaceStore.activeId}/operators`);
+		}
 	});
 </script>

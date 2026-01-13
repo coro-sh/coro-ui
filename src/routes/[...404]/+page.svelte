@@ -1,5 +1,5 @@
-<script>
-	import ErrorSection from '$lib/components/error/ErrorSection.svelte';
+<script lang="ts">
+	import ErrorSection from '$lib/components/ui/error/ErrorSection.svelte';
 </script>
 
 <ErrorSection

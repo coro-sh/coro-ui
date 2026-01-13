@@ -18,13 +18,9 @@ export interface UpdateUserRequest {
 	limits?: UserLimits;
 }
 
-export type Response<T> =
-	| ResponseData<T>
-	| ResponseError
+export type Response<T> = ResponseData<T> | ResponseError;
 
-export type ResponsePage<T> =
-	| ResponsePageData<T>
-	| ResponseError
+export type ResponsePage<T> = ResponsePageData<T> | ResponseError;
 
 export interface ResponseData<T> {
 	data: T;

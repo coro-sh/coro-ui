@@ -1,207 +1,180 @@
 <script lang="ts">
-	import '../app.css';
-	import { Button, Dropdown, DropdownDivider, DropdownItem, Navbar, NavBrand, Spinner } from 'flowbite-svelte';
-	import { isDarkTheme } from '$lib/stores/theme';
-	import DarkMode from '$lib/components/theme/DarkMode.svelte';
-	import { activeNamespaceId, getNamespaceName, namespaces, namespacesLoading } from '$lib/stores/namespace';
-	import ErrorToast from '$lib/components/toast/ErrorToast.svelte';
-	import {
-		CheckCircleOutline,
-		CheckOutline,
-		ChevronDownOutline,
-		ChevronUpOutline,
-		DotsVerticalOutline,
-		PlusOutline,
-		TrashBinOutline
-	} from 'flowbite-svelte-icons';
+	import './layout.css';
+	import 'svelte-highlight/styles/github-dark.css';
+	import favicon from '$lib/assets/favicon.png';
+	import { Toaster } from '$lib/components/ui/sonner';
+	import * as Tooltip from '$lib/components/ui/tooltip';
+	import { ModeWatcher, mode } from 'mode-watcher';
+	import { Button } from '$lib/components/ui/button';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+	import ThemeToggle from '$lib/components/ui/theme/ThemeToggle.svelte';
+	import CreateNamespaceModal from '$lib/components/ui/namespace/CreateNamespaceModal.svelte';
+	import { namespaceStore } from '$lib/stores/namespace.svelte';
+	import { showError, showSuccess } from '$lib/stores/toast';
 	import { goto } from '$app/navigation';
-	import CreateNamespaceModal from '$lib/components/namespace/CreateNamespaceModal.svelte';
-	import { errorToast, showErrorToast, showSuccessToast, successToast } from '$lib/stores/toast';
-	import BottomToast from '$lib/components/toast/BottomToast.svelte';
 	import { CoroClient } from '$lib/coro-client';
+	import type { Snippet } from 'svelte';
+	import ChevronDown from '@lucide/svelte/icons/chevron-down';
+	import ChevronUp from '@lucide/svelte/icons/chevron-up';
+	import Plus from '@lucide/svelte/icons/plus';
+	import Check from '@lucide/svelte/icons/check';
+	import Trash2 from '@lucide/svelte/icons/trash-2';
+	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 
-	$: logoImage = $isDarkTheme ? 'logo-dark.svg' : 'logo-light.svg';
+	// TODO: Add cloud integration
+	// import LogOut from '@lucide/svelte/icons/log-out';
+	// import { IS_CLOUD } from '$lib/config/build-target';
+	// import { cloudClient } from '$lib/cloud-client';
+
+	interface Props {
+		children: Snippet;
+	}
+
+	let { children }: Props = $props();
 
 	const mxClass = 'lg:mx-[5%] xl:mx-[10%] 2xl:mx-[17%]';
-	let dropdownOpen = false;
-	let openCreateNamespaceModal = false;
-	let hoveredNamespaceId: string | null;
-	let activeNamespaceOptionsOpen: string | null;
 
-	$: if (!dropdownOpen) {
-		// reset namespace sub-dropdown on close
-		activeNamespaceOptionsOpen = null;
-	}
+	let dropdownOpen = $state(false);
+	let openCreateNamespaceModal = $state(false);
+	let deleteNamespaceLoading = $state(false);
 
-	function toggleSubDropdown(namespaceId: string) {
-		activeNamespaceOptionsOpen = activeNamespaceOptionsOpen === namespaceId ? null : namespaceId;
-	}
+	const logoImage = $derived(mode.current === 'dark' ? 'logo-dark.svg' : 'logo-light.svg');
+	const activeNamespaceName = $derived(
+		namespaceStore.activeId
+			? namespaceStore.getNamespaceName(namespaceStore.activeId)
+			: 'Select namespace'
+	);
 
-	if (!$activeNamespaceId) {
-		assignDefaultNamespace();
-	}
-
-	function assignDefaultNamespace() {
-		activeNamespaceId.set($namespaces.find(item => item.name === 'default')?.id ?? $namespaces[0].id);
-	}
-
-	function updateActiveNamespaceButton(selectedId: string) {
+	function updateActiveNamespace(selectedId: string) {
 		dropdownOpen = false;
-		if (selectedId === $activeNamespaceId) {
+		if (selectedId === namespaceStore.activeId) {
 			return;
 		}
-		activeNamespaceId.set(selectedId);
-		goto(`/namespaces/${$activeNamespaceId}`);
+		namespaceStore.setActiveId(selectedId);
+		goto(`/namespaces/${selectedId}`);
 	}
-
-	let deleteNamespaceLoading = false;
 
 	async function deleteNamespace(namespaceId: string) {
 		try {
 			deleteNamespaceLoading = true;
 			await new CoroClient().deleteNamespace(namespaceId);
-			showSuccessToast('Namespace deleted');
-			namespaces.update(namespaces => namespaces.filter(item => item.id !== namespaceId));
-			if ($activeNamespaceId === namespaceId) {
-				assignDefaultNamespace();
-				await goto(`/namespaces/${$activeNamespaceId}`);
+			showSuccess('Namespace deleted');
+
+			const updatedNamespaces = namespaceStore.namespaces.filter((item) => item.id !== namespaceId);
+			namespaceStore.setNamespaces(updatedNamespaces);
+
+			if (updatedNamespaces.length === 0) {
+				namespaceStore.setActiveId(undefined);
+				await goto('/');
+			} else if (namespaceStore.activeId === namespaceId) {
+				const defaultNS = updatedNamespaces.find((item) => item.name === 'default');
+				const newActiveId = defaultNS?.id ?? updatedNamespaces[0].id;
+				namespaceStore.setActiveId(newActiveId);
+				await goto(`/namespaces/${newActiveId}`);
 			}
 		} catch (e) {
-			showErrorToast(e);
+			showError(e as Error);
 		} finally {
 			deleteNamespaceLoading = false;
 		}
-
 	}
 </script>
 
-<header
-	class="fixed top-0 z-40 mx-auto w-full flex-none border-b border-light-border dark:border-dark-border bg-light-content dark:bg-dark-canvas">
+<svelte:head>
+	<link href={favicon} rel="icon" />
+</svelte:head>
+
+<ModeWatcher defaultMode="dark" />
+
+<header class="bg-background fixed top-0 z-40 mx-auto w-full flex-none border-b">
 	<div class={mxClass}>
-		<Navbar fluid={true} class="text-light-base dark:text-dark-base flex items-center justify-between" color="none">
-			<div class="flex items-center">
-				<NavBrand href="/" class="mr-5 mt-2 mb-2">
-					<img src="/images/{logoImage}" class="h-6 sm:h-6 my-1" alt="coro logo" />
-				</NavBrand>
+		<nav class="flex h-14 items-center justify-between px-4">
+			<div class="flex items-center gap-4">
+				<a href="/" class="flex items-center">
+					<img src="/images/{logoImage}" class="h-6" alt="coro logo" />
+				</a>
 
-				{#if $namespaces.length}
-					<div class="relative ml-[3px]">
-						<Button size="sm"
-										class="min-w-36 min-h-9 flex items-center {$namespacesLoading ? 'justify-center' : 'justify-between' }">
-							{#if $namespacesLoading}
-								<Spinner color="custom" customColor="fill-primary-400" size={5} />
-							{:else}
-								{$activeNamespaceId ? getNamespaceName($activeNamespaceId) : 'Select namespace'}
-								{#if dropdownOpen}
-									<ChevronUpOutline />
-								{:else}
-									<ChevronDownOutline />
-								{/if}
-							{/if}
-						</Button>
-						{#if !$namespacesLoading}
-							<Dropdown bind:open={dropdownOpen}
-												class="z-20 w-52 bg-light-content dark:bg-dark-content border border-light-border dark:border-dark-border shadow-lg rounded-md">
-								<DropdownItem class="justify-between flex items-center hover:bg-mono-100 dark:hover:bg-mono-600"
-															on:click={() => { openCreateNamespaceModal = true; }}>
-									Create Namespace
-									<PlusOutline size="sm" />
-								</DropdownItem>
-								<DropdownDivider />
-								{#each $namespaces as namespace}
-									<DropdownItem
-										class="justify-between flex items-center relative hover:bg-mono-100 dark:hover:bg-mono-600"
-										on:click={() => { updateActiveNamespaceButton(namespace.id) }}
-									>
-										{namespace.name}
-										{#if $activeNamespaceId === namespace.id}
-											<span
-												class="relative"
-												role="presentation"
-												tabindex="-1"
-												on:mouseenter={() => { hoveredNamespaceId = namespace.id }}
-												on:mouseleave={() => { hoveredNamespaceId = null }}
-											>
-												<CheckOutline size="sm" />
-												{#if hoveredNamespaceId === namespace.id}
-													<button
-														class="hover:bg-mono-200 dark:hover:bg-mono-700 absolute right-0 top-0"
-														on:click={(e) => { e.stopPropagation(); toggleSubDropdown(namespace.id); }}
-													>
-														<DotsVerticalOutline size="sm" />
-													</button>
-												{/if}
-											</span>
+				{#if namespaceStore.namespaces.length}
+					<DropdownMenu.Root bind:open={dropdownOpen}>
+						<DropdownMenu.Trigger>
+							{#snippet child({ props })}
+								<Button {...props} variant="outline" size="sm" class="min-w-36 justify-between">
+									{#if namespaceStore.loading}
+										<LoaderCircle class="size-4 animate-spin" />
+									{:else}
+										{activeNamespaceName}
+										{#if dropdownOpen}
+											<ChevronUp class="size-4" />
 										{:else}
-											<button
-												class="hover:bg-mono-200 dark:hover:bg-mono-700"
-												on:click={(e) => { e.stopPropagation(); toggleSubDropdown(namespace.id); }}
-											>
-												<DotsVerticalOutline size="sm" />
-											</button>
+											<ChevronDown class="size-4" />
 										{/if}
-
-										<!-- Sub-dropdown -->
-										{#if activeNamespaceOptionsOpen === namespace.id}
-											<div
-												role="menu"
-												aria-label="Namespace options"
-												tabindex="0"
-												class="absolute left-full top-0 ml-2 min-w-48 bg-light-content dark:bg-dark-content border border-light-border dark:border-dark-border shadow-lg rounded-md"
-												on:click|stopPropagation
-												on:keydown={(e) => {
-														if (e.key === 'Escape') activeNamespaceOptionsOpen = null;
-												}}
-											>
-												<!-- TODO: support editing namespace -->
-												<!--  <DropdownItem class="justify-between flex items-center" on:click={() => console.log("Edit " + namespace.name)}>-->
-												<!--  	Edit Namespace-->
-												<!--  	<svg aria-hidden="true" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"-->
-												<!--  			 xmlns="http://www.w3.org/2000/svg">-->
-												<!--  		<path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />-->
-												<!--  		<path fill-rule="evenodd"-->
-												<!--  					d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"-->
-												<!--  					clip-rule="evenodd" />-->
-												<!--  	</svg>-->
-												<!--  </DropdownItem>-->
-												<DropdownItem class="text-red-500 justify-between flex items-center"
-																			on:click={() => deleteNamespace(namespace.id)}>
-													Delete Namespace
-													{#if deleteNamespaceLoading}
-														<Spinner size={4} color="gray" />
-													{:else}
-														<TrashBinOutline size="sm" />
-													{/if}
-												</DropdownItem>
-											</div>
+									{/if}
+								</Button>
+							{/snippet}
+						</DropdownMenu.Trigger>
+						<DropdownMenu.Content class="w-56">
+							<DropdownMenu.Item onclick={() => (openCreateNamespaceModal = true)}>
+								<Plus class="size-4" />
+								Create Namespace
+							</DropdownMenu.Item>
+							<DropdownMenu.Separator />
+							{#each namespaceStore.namespaces as namespace (namespace.id)}
+								<DropdownMenu.Sub>
+									<DropdownMenu.SubTrigger onclick={() => updateActiveNamespace(namespace.id)}>
+										{#if namespaceStore.activeId === namespace.id}
+											<Check class="size-4" />
 										{/if}
-									</DropdownItem>
-								{/each}
-							</Dropdown>
-						{/if}
-					</div>
+										<span class="truncate">{namespace.name}</span>
+									</DropdownMenu.SubTrigger>
+									<DropdownMenu.SubContent>
+										<!-- TODO: support editing namespace -->
+										<DropdownMenu.Item
+											class="text-destructive focus:text-destructive"
+											disabled={deleteNamespaceLoading}
+											onclick={() => deleteNamespace(namespace.id)}
+										>
+											{#if deleteNamespaceLoading}
+												<LoaderCircle class="size-4 animate-spin" />
+											{:else}
+												<Trash2 class="size-4" />
+											{/if}
+											Delete Namespace
+										</DropdownMenu.Item>
+									</DropdownMenu.SubContent>
+								</DropdownMenu.Sub>
+							{/each}
+						</DropdownMenu.Content>
+					</DropdownMenu.Root>
 				{/if}
 			</div>
 
-			<DarkMode />
-		</Navbar>
+			<div class="flex items-center gap-2">
+				<ThemeToggle />
+				<!-- TODO: Add cloud integration
+				{#if IS_CLOUD}
+					<Button
+						variant="ghost"
+						size="icon"
+						onclick={() => cloudClient.logout()}
+						aria-label="Logout"
+						title="Logout"
+					>
+						<LogOut class="size-5" />
+					</Button>
+				{/if}
+				-->
+			</div>
+		</nav>
 	</div>
 </header>
-<div class="overflow-hidden lg:flex">
-	<div class="relative h-full w-full overflow-y-auto pt-[70px] {mxClass} mt-4 mb-8 p-4">
-		<slot />
+
+<Tooltip.Provider>
+	<div class="overflow-hidden lg:flex">
+		<div class="relative h-full w-full overflow-y-auto pt-[70px] {mxClass} mt-4 mb-8 p-4">
+			{@render children()}
+		</div>
 	</div>
-</div>
 
-<CreateNamespaceModal bind:open={openCreateNamespaceModal} />
-
-<!-- Success toast -->
-<BottomToast toastStatus={$successToast !== null} backgroundColor="primary" size="xl" clearDuration={5000}>
-	<CheckCircleOutline slot="icon" class="bg-transparent" />
-	<div class="ml-2">
-		<p class="text-md font-semibold mb-1">{$successToast}</p>
-	</div>
-</BottomToast>
-
-<!-- Error toast -->
-<ErrorToast error={$errorToast} />
+	<CreateNamespaceModal bind:open={openCreateNamespaceModal} />
+	<Toaster position="bottom-center" richColors />
+</Tooltip.Provider>
