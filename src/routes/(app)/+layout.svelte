@@ -1,12 +1,11 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { namespaceStore } from '$lib/stores/namespace.svelte';
+	import { authStore } from '$lib/stores/auth.svelte';
+	import { cloudClient } from '$lib/cloud-client';
 	import ErrorLoadResourceSection from '$lib/components/ui/error/ErrorLoadResourceSection.svelte';
 	import type { Snippet } from 'svelte';
-
-	// TODO: Add cloud integration
-	// import { IS_CLOUD } from '$lib/config/build-target';
-	// const isCloudAuthenticated = page.data.limits !== undefined;
+	import { IS_CLOUD } from '$lib/config/build-target';
 
 	interface Props {
 		children: Snippet;
@@ -36,11 +35,22 @@
 			window.location.href = '/';
 		}
 	});
+
+	// Redirect to login if cloud mode and not authenticated
+	$effect(() => {
+		if (IS_CLOUD && !authStore.isAuthenticated && !authStore.loading) {
+			cloudClient.login();
+		}
+	});
 </script>
 
 {#if unknownPageNamespace}
 	<ErrorLoadResourceSection />
+{:else if IS_CLOUD && !authStore.isAuthenticated}
+	<!-- Show nothing while redirecting to login -->
+	<div class="flex h-screen items-center justify-center">
+		<div class="text-muted-foreground">Redirecting to login...</div>
+	</div>
 {:else}
-	<!-- TODO: Add cloud auth check: !IS_CLOUD || isCloudAuthenticated -->
 	{@render children()}
 {/if}

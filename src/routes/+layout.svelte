@@ -20,11 +20,11 @@
 	import Check from '@lucide/svelte/icons/check';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
-
-	// TODO: Add cloud integration
-	// import LogOut from '@lucide/svelte/icons/log-out';
-	// import { IS_CLOUD } from '$lib/config/build-target';
-	// import { cloudClient } from '$lib/cloud-client';
+	import LogOut from '@lucide/svelte/icons/log-out';
+	import User from '@lucide/svelte/icons/user';
+	import { IS_CLOUD } from '$lib/config/build-target';
+	import { cloudClient } from '$lib/cloud-client';
+	import { authStore } from '$lib/stores/auth.svelte';
 
 	interface Props {
 		children: Snippet;
@@ -150,19 +150,28 @@
 
 			<div class="flex items-center gap-2">
 				<ThemeToggle />
-				<!-- TODO: Add cloud integration
-				{#if IS_CLOUD}
-					<Button
-						variant="ghost"
-						size="icon"
-						onclick={() => cloudClient.logout()}
-						aria-label="Logout"
-						title="Logout"
-					>
-						<LogOut class="size-5" />
-					</Button>
+				{#if IS_CLOUD && authStore.user}
+					<DropdownMenu.Root>
+						<DropdownMenu.Trigger>
+							{#snippet child({ props })}
+								<Button {...props} variant="ghost" size="icon" aria-label="Profile menu">
+									<User class="size-5" />
+								</Button>
+							{/snippet}
+						</DropdownMenu.Trigger>
+						<DropdownMenu.Content align="end" class="w-48">
+							<DropdownMenu.Item onclick={() => goto('/profile')}>
+								<User class="size-4" />
+								Profile
+							</DropdownMenu.Item>
+							<DropdownMenu.Separator />
+							<DropdownMenu.Item onclick={() => cloudClient.logout()}>
+								<LogOut class="size-4" />
+								Sign out
+							</DropdownMenu.Item>
+						</DropdownMenu.Content>
+					</DropdownMenu.Root>
 				{/if}
-				-->
 			</div>
 		</nav>
 	</div>

@@ -21,24 +21,28 @@ export class Client {
 
 		const contentType = response.headers.get('Content-Type') || '';
 
-		if (contentType.includes('application/json')) {
-			const body: Response<T> = await response.json().catch(() => null);
-			if (!response.ok) {
+		// Handle error responses first, regardless of content type
+		if (!response.ok) {
+			// Try to parse JSON error body if available
+			if (contentType.includes('application/json')) {
+				const body: Response<T> = await response.json().catch(() => null);
 				this.handleErrorBody(response.status, response.statusText, body);
 			}
+			// For non-JSON responses (HTML error pages, etc), throw generic error
+			throw newResponseError(response.status, response.statusText);
+		}
 
+		// Handle successful responses based on content type
+		if (contentType.includes('application/json')) {
+			const body: Response<T> = await response.json().catch(() => null);
 			if (body && 'data' in body) {
 				return body.data;
 			}
-
 			throw newUnsupportedResponseError();
 		}
 
 		if (contentType.includes('text/plain')) {
 			const text = await response.text().catch(() => '');
-			if (!response.ok) {
-				throw newResponseError(response.status, response.statusText);
-			}
 			return text as T;
 		}
 
@@ -83,15 +87,21 @@ export class Client {
 
 		const contentType = response.headers.get('Content-Type') || '';
 
+		// Handle error responses first
+		if (!response.ok) {
+			if (contentType.includes('application/json')) {
+				const body: ResponsePage<T> = await response.json().catch(() => null);
+				this.handleErrorBody(response.status, response.statusText, body);
+			}
+			throw newResponseError(response.status, response.statusText);
+		}
+
+		// Handle successful responses
 		if (!contentType.includes('application/json')) {
 			throw newUnsupportedResponseContentTypeError(contentType);
 		}
 
 		const body: ResponsePage<T> = await response.json().catch(() => null);
-
-		if (!response.ok) {
-			this.handleErrorBody(response.status, response.statusText, body);
-		}
 
 		if (body && 'data' in body) {
 			return body;
