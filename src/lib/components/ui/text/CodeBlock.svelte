@@ -26,14 +26,17 @@
 	const codeLines = $derived(content ? content.split('\n') : []);
 	const exceedsLimit = $derived(codeLines.length > 15);
 
-	function copyToClipboard() {
-		copied = true;
-		navigator.clipboard.writeText(content).then(() => {
+	async function copyToClipboard() {
+		try {
+			await navigator.clipboard.writeText(content);
+			copied = true;
 			showCopied();
-		});
-		setTimeout(() => {
-			copied = false;
-		}, 2000);
+			setTimeout(() => {
+				copied = false;
+			}, 2000);
+		} catch (error) {
+			console.error('Failed to copy to clipboard:', error);
+		}
 	}
 </script>
 
