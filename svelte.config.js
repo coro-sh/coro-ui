@@ -10,7 +10,7 @@ const config = {
 		adapter: adapter({
 			pages: buildPath,
 			assets: buildPath,
-			fallback: '200.html',
+			fallback: 'index.html',
 		}),
 	},
 };

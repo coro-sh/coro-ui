@@ -8,8 +8,6 @@ import { IS_CLOUD } from '$lib/config/build-target';
 import { cloudClient } from '$lib/cloud-client';
 import type { CloudMeResponse } from '$lib/models/cloud';
 
-export const ssr = false;
-
 async function loadNamespaces() {
 	namespaceStore.setLoading(true);
 	try {
