@@ -1,7 +1,6 @@
 <script lang="ts">
 	import './layout.css';
 	import 'svelte-highlight/styles/github-dark.css';
-	import favicon from '$lib/assets/favicon.png';
 	import { Toaster } from '$lib/components/ui/sonner';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import { ModeWatcher, mode } from 'mode-watcher';
@@ -80,9 +79,6 @@
 	}
 </script>
 
-<svelte:head>
-	<link href={favicon} rel="icon" />
-</svelte:head>
 
 <ModeWatcher defaultMode="dark" />
 
