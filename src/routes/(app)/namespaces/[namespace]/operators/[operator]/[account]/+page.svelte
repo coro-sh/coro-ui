@@ -60,6 +60,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>{account?.name ? `${account.name} - Coro` : 'Account - Coro'}</title>
+</svelte:head>
+
 <main>
 	{#if loadFailed}
 		<ErrorLoadResourceSection />

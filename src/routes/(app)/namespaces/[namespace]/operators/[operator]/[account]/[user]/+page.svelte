@@ -47,6 +47,10 @@
 	});
 </script>
 
+<svelte:head>
+	<title>{user?.name ? `${user.name} - Coro` : 'User - Coro'}</title>
+</svelte:head>
+
 <main>
 	{#if loadFailed}
 		<ErrorLoadResourceSection />

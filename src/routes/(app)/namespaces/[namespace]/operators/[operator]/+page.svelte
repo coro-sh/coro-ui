@@ -109,6 +109,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>{operator?.name ? `${operator.name} - Coro` : 'Operator - Coro'}</title>
+</svelte:head>
+
 <main>
 	{#if loadFailed}
 		<ErrorLoadResourceSection />

@@ -9,3 +9,7 @@
 		}
 	});
 </script>
+
+<svelte:head>
+	<title>Namespaces - Coro</title>
+</svelte:head>

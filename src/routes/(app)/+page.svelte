@@ -22,6 +22,10 @@
 	});
 </script>
 
+<svelte:head>
+	<title>Dashboard - Coro</title>
+</svelte:head>
+
 {#if !namespaceStore.namespaces.length}
 	<div class="flex h-96 items-center justify-center">
 		<Card.Root class="w-full max-w-2xl">

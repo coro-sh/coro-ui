@@ -81,6 +81,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Operators - Coro</title>
+</svelte:head>
+
 <main>
 	{#if loadFailed}
 		<ErrorLoadResourceSection />
