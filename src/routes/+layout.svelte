@@ -26,6 +26,7 @@
 	import { IS_CLOUD } from '$lib/config/build-target';
 	import { cloudClient } from '$lib/cloud-client';
 	import { authStore } from '$lib/stores/auth.svelte';
+	import { Badge } from '$lib/components/ui/badge';
 
 	interface Props {
 		children: Snippet;
@@ -90,16 +91,20 @@
 	}
 </script>
 
-
 <ModeWatcher defaultMode="dark" />
 
 <header class="bg-background fixed top-0 z-40 mx-auto w-full flex-none border-b">
 	<div class={mxClass}>
 		<nav class="flex h-14 items-center justify-between px-4">
 			<div class="flex items-center gap-4">
-				<a href="/" class="flex cursor-pointer items-center">
-					<img src="/images/{logoImage}" class="h-6" alt="coro logo" />
-				</a>
+				<div class="flex items-center gap-2">
+					<a href="/" class="flex cursor-pointer items-center">
+						<img src="/images/{logoImage}" class="h-6" alt="coro logo" />
+					</a>
+					{#if IS_CLOUD}
+						<Badge variant="outline" class="text-xs">BETA</Badge>
+					{/if}
+				</div>
 
 				{#if namespaceStore.namespaces.length}
 					<DropdownMenu.Root bind:open={dropdownOpen}>
@@ -134,9 +139,7 @@
 										<span class="truncate">{namespace.name}</span>
 									</DropdownMenu.SubTrigger>
 									<DropdownMenu.SubContent>
-										<DropdownMenu.Item
-											onclick={() => editNamespace(namespace.id, namespace.name)}
-										>
+										<DropdownMenu.Item onclick={() => editNamespace(namespace.id, namespace.name)}>
 											<Pencil class="size-4" />
 											Edit Namespace
 										</DropdownMenu.Item>
