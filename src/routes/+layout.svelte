@@ -27,6 +27,7 @@
 	import { cloudClient } from '$lib/cloud-client';
 	import { authStore } from '$lib/stores/auth.svelte';
 	import { Badge } from '$lib/components/ui/badge';
+	import Footer from '$lib/components/ui/footer/Footer.svelte';
 
 	interface Props {
 		children: Snippet;
@@ -194,10 +195,16 @@
 
 <Tooltip.Provider>
 	<div class="overflow-hidden lg:flex">
-		<div class="relative h-full w-full overflow-y-auto pt-[70px] {mxClass} mt-4 mb-8 p-4">
+		<div
+			class="relative h-full w-full overflow-y-auto pt-[70px] {mxClass} mt-4 mb-8 p-4"
+			class:pb-12={IS_CLOUD}
+		>
 			{@render children()}
 		</div>
 	</div>
+	{#if IS_CLOUD}
+		<Footer />
+	{/if}
 
 	<CreateNamespaceModal bind:open={openCreateNamespaceModal} />
 	<EditNamespaceModal
