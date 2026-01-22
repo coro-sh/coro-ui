@@ -40,6 +40,14 @@ export class CoroClient {
 		return new Paginator<NamespaceResponse>(this.client, '/namespaces', size, cursor);
 	}
 
+	async updateNamespace(namespaceId: string, name: string): Promise<NamespaceResponse> {
+		return this.client.request<NamespaceResponse>(`/namespaces/${namespaceId}`, {
+			method: 'PUT',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ name }),
+		});
+	}
+
 	async deleteNamespace(namespaceId: string): Promise<void> {
 		return this.client.requestNoContent(`/namespaces/${namespaceId}`, {
 			method: 'DELETE',

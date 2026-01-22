@@ -8,6 +8,7 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import ThemeToggle from '$lib/components/ui/theme/ThemeToggle.svelte';
 	import CreateNamespaceModal from '$lib/components/ui/namespace/CreateNamespaceModal.svelte';
+	import EditNamespaceModal from '$lib/components/ui/namespace/EditNamespaceModal.svelte';
 	import { namespaceStore } from '$lib/stores/namespace.svelte';
 	import { showError, showSuccess } from '$lib/stores/toast';
 	import { goto } from '$app/navigation';
@@ -17,6 +18,7 @@
 	import ChevronUp from '@lucide/svelte/icons/chevron-up';
 	import Plus from '@lucide/svelte/icons/plus';
 	import Check from '@lucide/svelte/icons/check';
+	import Pencil from '@lucide/svelte/icons/pencil';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import LogOut from '@lucide/svelte/icons/log-out';
@@ -35,6 +37,9 @@
 
 	let dropdownOpen = $state(false);
 	let openCreateNamespaceModal = $state(false);
+	let openEditNamespaceModal = $state(false);
+	let editNamespaceId = $state('');
+	let editNamespaceName = $state('');
 	let deleteNamespaceLoading = $state(false);
 
 	const logoImage = $derived(mode.current === 'dark' ? 'logo-dark.svg' : 'logo-light.svg');
@@ -51,6 +56,12 @@
 		}
 		namespaceStore.setActiveId(selectedId);
 		goto(`/namespaces/${selectedId}`);
+	}
+
+	function editNamespace(namespaceId: string, namespaceName: string) {
+		editNamespaceId = namespaceId;
+		editNamespaceName = namespaceName;
+		openEditNamespaceModal = true;
 	}
 
 	async function deleteNamespace(namespaceId: string) {
@@ -86,7 +97,7 @@
 	<div class={mxClass}>
 		<nav class="flex h-14 items-center justify-between px-4">
 			<div class="flex items-center gap-4">
-				<a href="/" class="flex items-center">
+				<a href="/" class="flex cursor-pointer items-center">
 					<img src="/images/{logoImage}" class="h-6" alt="coro logo" />
 				</a>
 
@@ -123,7 +134,12 @@
 										<span class="truncate">{namespace.name}</span>
 									</DropdownMenu.SubTrigger>
 									<DropdownMenu.SubContent>
-										<!-- TODO: support editing namespace -->
+										<DropdownMenu.Item
+											onclick={() => editNamespace(namespace.id, namespace.name)}
+										>
+											<Pencil class="size-4" />
+											Edit Namespace
+										</DropdownMenu.Item>
 										<DropdownMenu.Item
 											class="text-destructive focus:text-destructive"
 											disabled={deleteNamespaceLoading}
@@ -181,5 +197,10 @@
 	</div>
 
 	<CreateNamespaceModal bind:open={openCreateNamespaceModal} />
+	<EditNamespaceModal
+		bind:open={openEditNamespaceModal}
+		namespaceId={editNamespaceId}
+		namespaceName={editNamespaceName}
+	/>
 	<Toaster position="bottom-center" richColors />
 </Tooltip.Provider>
