@@ -35,7 +35,24 @@
 
 	let { children }: Props = $props();
 
-	const mxClass = 'lg:mx-[5%] xl:mx-[10%] 2xl:mx-[17%]';
+	let windowWidth = $state(0);
+
+	const mxClass = $derived(
+		windowWidth >= 2200
+			? 'lg:mx-[10%] xl:mx-[8%] 2xl:mx-[14%] !mx-[22%]'
+			: 'lg:mx-[10%] xl:mx-[8%] 2xl:mx-[14%]'
+	);
+
+	$effect(() => {
+		if (typeof window !== 'undefined') {
+			windowWidth = window.innerWidth;
+			const handleResize = () => {
+				windowWidth = window.innerWidth;
+			};
+			window.addEventListener('resize', handleResize);
+			return () => window.removeEventListener('resize', handleResize);
+		}
+	});
 
 	let dropdownOpen = $state(false);
 	let openCreateNamespaceModal = $state(false);
