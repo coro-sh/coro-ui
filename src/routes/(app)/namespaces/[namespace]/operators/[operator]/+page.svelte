@@ -24,6 +24,7 @@
 	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
 	import CloudUpload from '@lucide/svelte/icons/cloud-upload';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
+	import { IS_CLOUD } from '$lib/config/build-target';
 
 	const namespaceId = $derived(page.params.namespace ?? '');
 	const operatorId = $derived(page.params.operator ?? '');
@@ -41,10 +42,16 @@
 	let natsConfig = $state('');
 	let proxyToken = $state('');
 
-	let proxyAgentCmd = $state(`docker run --rm corosh/coro-proxy-agent  \\
+	let proxyAgentCmd = $state(
+		IS_CLOUD
+			? `docker run --rm corosh/coro-proxy-agent \\
+	--token <PROXY_TOKEN> \\
+	--nats-url nats://<NATS_HOST_PORT>`
+			: `docker run --rm corosh/coro-proxy-agent \\
 	--token <PROXY_TOKEN> \\
 	--nats-url nats://<NATS_HOST_PORT> \\
-	--broker-url ws://<BROKER_HOST_PORT>/api/v1/broker`);
+	--broker-url ws://<BROKER_HOST_PORT>/api/v1/broker`
+	);
 
 	const client = new CoroClient();
 	const paginator = $derived(client.paginateAccounts(operatorId));
