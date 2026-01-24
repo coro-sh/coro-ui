@@ -51,7 +51,16 @@ export class Client {
 
 	async requestNoContent(path: string, options: RequestInit = {}): Promise<void> {
 		const response = await this.fetch(path, options);
+
+		const contentType = response.headers.get('Content-Type') || '';
+
 		if (!response.ok) {
+			// Try to parse JSON error body if available
+			if (contentType.includes('application/json')) {
+				const body: Response<unknown> = await response.json().catch(() => null);
+				this.handleErrorBody(response.status, response.statusText, body);
+			}
+			// For non-JSON responses, throw generic error
 			throw newResponseError(response.status, response.statusText);
 		}
 		if (response.status === 204) {
