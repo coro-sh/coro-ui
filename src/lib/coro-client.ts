@@ -6,6 +6,9 @@ import type {
 	OperatorProxyTokenResponse,
 	OperatorResponse,
 	OperatorStatus,
+	Stream,
+	StreamMessage,
+	StreamMessageContent,
 	UpdateAccountRequest,
 	UpdateUserRequest,
 	UserIssuanceResponse,
@@ -257,6 +260,64 @@ export class CoroClient {
 				method: 'GET',
 				headers: { 'Content-Type': 'application/json' },
 				body: null,
+			}
+		);
+	}
+
+	// Stream methods
+
+	async listStreams(accountId: string): Promise<Stream[]> {
+		return this.client.request<Stream[]>(
+			`/namespaces/${namespaceStore.activeId}/accounts/${accountId}/streams`,
+			{
+				method: 'GET',
+				headers: { 'Content-Type': 'application/json' },
+			}
+		);
+	}
+
+	async fetchStream(accountId: string, streamName: string): Promise<Stream> {
+		return this.client.request<Stream>(
+			`/namespaces/${namespaceStore.activeId}/accounts/${accountId}/streams/${streamName}`,
+			{
+				method: 'GET',
+				headers: { 'Content-Type': 'application/json' },
+			}
+		);
+	}
+
+	async fetchStreamMessages(
+		accountId: string,
+		streamName: string,
+		startSequence?: number,
+		batchSize?: number
+	): Promise<StreamMessage[]> {
+		const params = new URLSearchParams();
+		if (startSequence !== undefined) {
+			params.append('start_sequence', startSequence.toString());
+		}
+		if (batchSize !== undefined) {
+			params.append('batch_size', batchSize.toString());
+		}
+		const queryString = params.toString();
+		const path = `/namespaces/${namespaceStore.activeId}/accounts/${accountId}/streams/${streamName}/messages${queryString ? `?${queryString}` : ''}`;
+
+		return this.client.request<StreamMessage[]>(path, {
+			method: 'GET',
+			headers: { 'Content-Type': 'application/json' },
+		});
+	}
+
+	async fetchStreamMessageContent(
+		accountId: string,
+		streamName: string,
+		streamSequence: number
+	): Promise<StreamMessageContent> {
+		return this.client.request<StreamMessageContent>(
+			`/namespaces/${namespaceStore.activeId}/accounts/${accountId}/streams/${streamName}/messages/${streamSequence}`,
+			{
+				method: 'GET',
+				headers: { 'Content-Type': 'application/json' },
 			}
 		);
 	}

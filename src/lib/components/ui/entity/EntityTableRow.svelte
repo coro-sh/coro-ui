@@ -6,27 +6,33 @@
 	import type { Snippet } from 'svelte';
 
 	interface Props {
-		href: string;
+		href?: string;
 		bottomBorder?: boolean;
 		children: Snippet;
+		disabled?: boolean;
 	}
 
-	let { href, bottomBorder = true, children }: Props = $props();
+	let { href, bottomBorder = true, children, disabled = false }: Props = $props();
 
 	function navigate() {
-		goto(href);
+		if (href && !disabled) {
+			goto(href);
+		}
 	}
 </script>
 
 <Table.Row
 	class={cn(
-		'hover:bg-accent/50 cursor-pointer transition-colors',
+		disabled ? 'cursor-not-allowed opacity-50' : 'hover:bg-accent/50 cursor-pointer',
+		'transition-colors',
 		bottomBorder ? 'border-border border-b' : ''
 	)}
 	onclick={navigate}
 >
 	{@render children()}
 	<Table.Cell class="text-right">
-		<More />
+		{#if !disabled}
+			<More />
+		{/if}
 	</Table.Cell>
 </Table.Row>

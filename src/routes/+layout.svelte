@@ -67,6 +67,7 @@
 			? namespaceStore.getNamespaceName(namespaceStore.activeId)
 			: 'Select namespace'
 	);
+	const homeUrl = $derived(namespaceStore.activeId ? `/namespaces/${namespaceStore.activeId}` : '/');
 
 	function updateActiveNamespace(selectedId: string) {
 		dropdownOpen = false;
@@ -116,7 +117,7 @@
 		<nav class="flex h-14 items-center justify-between px-4">
 			<div class="flex items-center gap-4">
 				<div class="flex items-center gap-2">
-					<a href="/" class="flex cursor-pointer items-center">
+					<a href={homeUrl} class="flex cursor-pointer items-center">
 						<img src="/images/{logoImage}" class="h-6" alt="coro logo" />
 					</a>
 					{#if IS_CLOUD}

@@ -92,7 +92,7 @@
 		<Breadcrumb.Root class="mb-5">
 			<Breadcrumb.List>
 				<Breadcrumb.Item>
-					<Breadcrumb.Link href="/" class="flex items-center gap-2">
+					<Breadcrumb.Link href={`/namespaces/${namespaceId}/operators`} class="flex items-center gap-2">
 						<Home class="size-4" />
 						Operators
 					</Breadcrumb.Link>
