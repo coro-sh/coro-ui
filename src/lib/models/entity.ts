@@ -99,3 +99,25 @@ export interface UserLimits {
 export interface OperatorProxyTokenResponse {
 	token: string;
 }
+
+export interface Stream {
+	name: string;
+	subjects: string[];
+	message_count: number;
+	consumer_count: number;
+	create_time: number;
+}
+
+export interface StreamMessage {
+	stream_sequence: string;
+	subject: string;
+	size_bytes: number;
+	preview: string;
+	timestamp: number;
+}
+
+export interface StreamMessageContent {
+	stream_sequence: string;
+	timestamp: number;
+	data: string;
+}

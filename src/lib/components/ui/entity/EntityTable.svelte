@@ -17,6 +17,8 @@
 		loadingMore?: boolean;
 		onloadmore?: () => void;
 		children?: Snippet;
+		hideCreateButton?: boolean;
+		disabled?: boolean;
 	}
 
 	let {
@@ -29,15 +31,19 @@
 		loadingMore = $bindable(false),
 		onloadmore,
 		children,
+		hideCreateButton = false,
+		disabled = false,
 	}: Props = $props();
 </script>
 
 <div class="flex items-center justify-between pb-4">
 	<h2 class="text-xl font-semibold sm:text-2xl">{`${upperCaseFirstChar(entityType)}s`}</h2>
-	<Button onclick={() => (openCreateModal = true)}>
-		<Plus class="size-4" />
-		{`Create ${upperCaseFirstChar(entityType)}`}
-	</Button>
+	{#if !hideCreateButton}
+		<Button onclick={() => (openCreateModal = true)} {disabled}>
+			<Plus class="size-4" />
+			{`Create ${upperCaseFirstChar(entityType)}`}
+		</Button>
+	{/if}
 </div>
 
 <div class="overflow-x-auto">
@@ -62,11 +68,19 @@
 				<Table.Row>
 					<Table.Cell colspan={columns.length}>
 						<div class="text-muted-foreground my-20 text-center">
-							<p class="mb-5">{`No ${upperCaseFirstChar(entityType)}s found`}</p>
-							<Button variant="outline" onclick={() => (openCreateModal = true)}>
-								<Plus class="size-4" />
-								{`Create ${upperCaseFirstChar(entityType)}`}
-							</Button>
+							{#if disabled}
+								<p>
+									NATS server not connected. Connect your Operator's NATS server to view {entityType}s.
+								</p>
+							{:else}
+								<p class="mb-5">{`No ${upperCaseFirstChar(entityType)}s found`}</p>
+								{#if !hideCreateButton}
+									<Button variant="outline" onclick={() => (openCreateModal = true)}>
+										<Plus class="size-4" />
+										{`Create ${upperCaseFirstChar(entityType)}`}
+									</Button>
+								{/if}
+							{/if}
 						</div>
 					</Table.Cell>
 				</Table.Row>

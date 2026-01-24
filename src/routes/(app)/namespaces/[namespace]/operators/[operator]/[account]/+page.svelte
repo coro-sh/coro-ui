@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import UsersTable from '$lib/components/ui/user/UsersTable.svelte';
+	import StreamsTable from '$lib/components/ui/stream/StreamsTable.svelte';
 	import AccountOverview from '$lib/components/ui/account/AccountOverview.svelte';
 	import TabGroup from '$lib/components/ui/tab/TabGroup.svelte';
 	import TabCard from '$lib/components/ui/tab/TabCard.svelte';
@@ -9,7 +10,7 @@
 	import ErrorLoadResourceSection from '$lib/components/ui/error/ErrorLoadResourceSection.svelte';
 	import { onMount } from 'svelte';
 	import { CoroClient } from '$lib/coro-client';
-	import type { AccountResponse, OperatorResponse, UserResponse } from '$lib/models/entity';
+	import type { AccountResponse, OperatorResponse, UserResponse, Stream } from '$lib/models/entity';
 	import { page } from '$app/state';
 	import { namespaceStore } from '$lib/stores/namespace.svelte';
 	import { showError } from '$lib/stores/toast';
@@ -19,15 +20,23 @@
 	const namespaceId = $derived(page.params.namespace ?? '');
 	const operatorId = $derived(page.params.operator ?? '');
 	const accountId = $derived(page.params.account ?? '');
+	const activeTab = $derived.by(() => {
+		const urlParams = new URLSearchParams(page.url.search);
+		const tabParam = urlParams.get('tab');
+		return tabParam ? parseInt(tabParam) : 1;
+	});
 
 	let loading = $state(true);
 	let loadingMoreUsers = $state(false);
+	let loadingStreams = $state(false);
 	let loadFailed = $state(false);
 	let openCreateUser = $state(false);
+	let streamsFetched = $state(false);
 	let operator = $state<OperatorResponse | undefined>(undefined);
 	let account = $state<AccountResponse | undefined>(undefined);
 	let users = $state<UserResponse[]>([]);
 	let hasMoreUsers = $state(false);
+	let streams = $state<Stream[]>([]);
 
 	const client = new CoroClient();
 	const paginator = $derived(client.paginateUsers(accountId));
@@ -46,6 +55,13 @@
 		}
 	});
 
+	$effect(() => {
+		// Fetch streams when tab 3 is active and we haven't fetched yet
+		if (activeTab === 3 && operator?.status.connected && !streamsFetched && !loadingStreams) {
+			void fetchStreams();
+		}
+	});
+
 	async function fetchNextUsersPage() {
 		loadingMoreUsers = true;
 		try {
@@ -56,6 +72,23 @@
 			showError(e as Error);
 		} finally {
 			loadingMoreUsers = false;
+		}
+	}
+
+	async function fetchStreams() {
+		if (!operator?.status.connected || streamsFetched || loadingStreams) return;
+
+		loadingStreams = true;
+		try {
+			const result = await client.listStreams(accountId);
+			// Ensure we always have a valid array
+			streams = Array.isArray(result) ? result : [];
+		} catch (e) {
+			showError(e as Error);
+			streams = []; // Reset to empty array on error
+		} finally {
+			loadingStreams = false;
+			streamsFetched = true;
 		}
 	}
 </script>
@@ -116,7 +149,7 @@
 			{/if}
 		</div>
 
-		<TabGroup tabNames={['Overview', 'Users']}>
+		<TabGroup tabNames={['Overview', 'Users', 'Streams']}>
 			{#snippet children(tab)}
 				{#if tab === 1}
 					<TabCard>
@@ -134,6 +167,18 @@
 							{users}
 							onloadmore={fetchNextUsersPage}
 						/>
+					</TabCard>
+				{:else if tab === 3}
+					<TabCard>
+						{#if operator}
+							<StreamsTable
+								bind:loading={loadingStreams}
+								{streams}
+								{accountId}
+								{operatorId}
+								disabled={!operator.status.connected}
+							/>
+						{/if}
 					</TabCard>
 				{/if}
 			{/snippet}
