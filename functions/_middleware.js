@@ -45,10 +45,8 @@ export async function onRequest(context) {
 	// Create headers for backend request
 	const backendHeaders = new Headers(request.headers);
 
-	// Add Worker authentication header (except for broker which has its own auth)
-	if (!url.pathname.startsWith('/api/v1/broker')) {
-		backendHeaders.set('X-Worker-Secret', workerSecret);
-	}
+	// // Add Worker authentication header
+	backendHeaders.set('X-Worker-Secret', workerSecret);
 
 	// Add proxy forwarding headers for OIDC compatibility
 	// These tell the backend what the original request looked like from the client's perspective
