@@ -31,8 +31,8 @@
 		return data;
 	});
 
-	async function deleteCallback() {
-		await new CoroClient().deleteOperator(operator.id);
+	async function deleteCallback(unmanage?: boolean) {
+		await new CoroClient().deleteOperator(operator.id, unmanage);
 		await goto('/');
 	}
 </script>
@@ -46,6 +46,10 @@
 	data={operatorData}
 	jwt={operator?.jwt}
 	{deleteCallback}
+	allowUnmanage={true}
+	unmanageLabel="Unmanage Accounts"
+	unmanageTooltip="Unmanage all accounts belonging to this operator. This removes the accounts from Coro but does not delete any resources in NATS."
+	additionalNote="All accounts belonging to this operator must first be deleted, or you can use the unmanage option below to remove them from Coro without deleting NATS resources."
 />
 
 {#if operator}

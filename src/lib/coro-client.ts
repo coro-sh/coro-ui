@@ -110,13 +110,17 @@ export class CoroClient {
 		);
 	}
 
-	async deleteOperator(operatorId: string): Promise<void> {
-		return this.client.requestNoContent(
-			`/namespaces/${namespaceStore.activeId}/operators/${operatorId}`,
-			{
-				method: 'DELETE',
-			}
-		);
+	async deleteOperator(operatorId: string, unmanageAccounts?: boolean): Promise<void> {
+		const params = new URLSearchParams();
+		if (unmanageAccounts) {
+			params.append('unmanage_accounts', 'true');
+		}
+		const queryString = params.toString();
+		const url = `/namespaces/${namespaceStore.activeId}/operators/${operatorId}${queryString ? `?${queryString}` : ''}`;
+
+		return this.client.requestNoContent(url, {
+			method: 'DELETE',
+		});
 	}
 
 	// Account methods

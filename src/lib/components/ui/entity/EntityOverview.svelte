@@ -20,7 +20,9 @@
 		jwt?: string | null;
 		deleteCallback: (unmanage?: boolean) => Promise<void>;
 		allowUnmanage?: boolean;
+		unmanageLabel?: string;
 		unmanageTooltip?: string;
+		additionalNote?: string;
 	}
 
 	let {
@@ -34,7 +36,9 @@
 		jwt = null,
 		deleteCallback,
 		allowUnmanage = false,
+		unmanageLabel,
 		unmanageTooltip,
+		additionalNote,
 	}: Props = $props();
 </script>
 
@@ -48,7 +52,7 @@
 				Edit
 			</Button>
 		{/if}
-		<DeleteButton size="sm" {deleteCallback} {allowUnmanage} {unmanageTooltip} />
+		<DeleteButton size="sm" {deleteCallback} {allowUnmanage} {unmanageLabel} {unmanageTooltip} {additionalNote} />
 	</div>
 </div>
 

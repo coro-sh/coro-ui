@@ -11,10 +11,19 @@
 		deleteCallback: (unmanage?: boolean) => Promise<void>;
 		size?: 'default' | 'sm' | 'lg' | 'icon';
 		allowUnmanage?: boolean;
+		unmanageLabel?: string;
 		unmanageTooltip?: string;
+		additionalNote?: string;
 	}
 
-	let { deleteCallback, size = 'default', allowUnmanage = false, unmanageTooltip }: Props = $props();
+	let {
+		deleteCallback,
+		size = 'default',
+		allowUnmanage = false,
+		unmanageLabel = 'Unmanage',
+		unmanageTooltip,
+		additionalNote,
+	}: Props = $props();
 
 	let open = $state(false);
 	let loading = $state(false);
@@ -50,6 +59,11 @@
 				This action cannot be undone. This will permanently delete this item.
 			</AlertDialog.Description>
 		</AlertDialog.Header>
+		{#if additionalNote}
+			<div class="bg-muted/50 border rounded-md p-3 text-sm">
+				<p>{additionalNote}</p>
+			</div>
+		{/if}
 		{#if allowUnmanage}
 			<div class="flex items-start gap-3 py-4 border-t border-b">
 				<input
@@ -60,7 +74,7 @@
 				/>
 				<div class="flex-1">
 					<label for="unmanage-toggle" class="text-sm font-medium cursor-pointer">
-						Unmanage Account
+						{unmanageLabel}
 					</label>
 					{#if unmanageTooltip}
 						<p class="text-xs text-muted-foreground mt-1">{unmanageTooltip}</p>

@@ -75,7 +75,8 @@
 	jwt={account?.jwt}
 	{deleteCallback}
 	allowUnmanage={true}
-	unmanageTooltip="Unmanage the account rather than deleting it. This removes the account from Coro Cloud but does not delete any resources in NATS."
+	unmanageLabel="Unmanage Account"
+	unmanageTooltip="Unmanage the account rather than deleting it. This removes the account from Coro but does not delete any resources in NATS."
 />
 
 {#if account}
