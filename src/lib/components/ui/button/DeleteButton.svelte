@@ -6,6 +6,7 @@
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import Info from '@lucide/svelte/icons/info';
+	import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
 
 	interface Props {
 		deleteCallback: (unmanage?: boolean) => Promise<void>;
@@ -14,6 +15,7 @@
 		unmanageLabel?: string;
 		unmanageTooltip?: string;
 		additionalNote?: string;
+		requireUnmanageToDelete?: boolean;
 	}
 
 	let {
@@ -23,11 +25,14 @@
 		unmanageLabel = 'Unmanage',
 		unmanageTooltip,
 		additionalNote,
+		requireUnmanageToDelete = false,
 	}: Props = $props();
 
 	let open = $state(false);
 	let loading = $state(false);
 	let unmanage = $state(false);
+
+	const deleteDisabled = $derived(loading || (requireUnmanageToDelete && allowUnmanage && !unmanage));
 
 	async function handleDelete() {
 		try {
@@ -60,8 +65,9 @@
 			</AlertDialog.Description>
 		</AlertDialog.Header>
 		{#if additionalNote}
-			<div class="bg-muted/50 border rounded-md p-3 text-sm">
-				<p>{additionalNote}</p>
+			<div class="bg-yellow-500/10 border-yellow-500/50 border rounded-md p-3 flex gap-2 items-start">
+				<AlertTriangle class="size-4 text-yellow-600 dark:text-yellow-500 flex-shrink-0 mt-0.5" />
+				<p class="text-sm text-yellow-700 dark:text-yellow-400">{additionalNote}</p>
 			</div>
 		{/if}
 		{#if allowUnmanage}
@@ -84,7 +90,7 @@
 		{/if}
 		<AlertDialog.Footer>
 			<AlertDialog.Cancel disabled={loading}>Cancel</AlertDialog.Cancel>
-			<Button variant="destructive" onclick={handleDelete} disabled={loading} class="min-w-24">
+			<Button variant="destructive" onclick={handleDelete} disabled={deleteDisabled} class="min-w-24">
 				{#if loading}
 					<LoaderCircle class="size-4 animate-spin" />
 				{:else}

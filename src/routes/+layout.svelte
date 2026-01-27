@@ -6,6 +6,7 @@
 	import { ModeWatcher, mode } from 'mode-watcher';
 	import { Button } from '$lib/components/ui/button';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	import ThemeToggle from '$lib/components/ui/theme/ThemeToggle.svelte';
 	import CreateNamespaceModal from '$lib/components/ui/namespace/CreateNamespaceModal.svelte';
 	import EditNamespaceModal from '$lib/components/ui/namespace/EditNamespaceModal.svelte';
@@ -23,6 +24,7 @@
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import LogOut from '@lucide/svelte/icons/log-out';
 	import User from '@lucide/svelte/icons/user';
+	import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
 	import { IS_CLOUD } from '$lib/config/build-target';
 	import { cloudClient } from '$lib/cloud-client';
 	import { authStore } from '$lib/stores/auth.svelte';
@@ -60,6 +62,9 @@
 	let editNamespaceId = $state('');
 	let editNamespaceName = $state('');
 	let deleteNamespaceLoading = $state(false);
+	let openDeleteNamespaceDialog = $state(false);
+	let deleteNamespaceId = $state('');
+	let deleteNamespaceHasOperators = $state(false);
 
 	const logoImage = $derived(mode.current === 'dark' ? 'logo-dark.svg' : 'logo-light.svg');
 	const activeNamespaceName = $derived(
@@ -84,24 +89,43 @@
 		openEditNamespaceModal = true;
 	}
 
-	async function deleteNamespace(namespaceId: string) {
+	async function openDeleteDialog(namespaceId: string) {
+		deleteNamespaceId = namespaceId;
+
+		// Check if namespace has operators
+		try {
+			const savedActiveId = namespaceStore.activeId;
+			namespaceStore.setActiveId(namespaceId);
+			const paginator = new CoroClient().paginateOperators(1);
+			const data = await paginator.fetchNext();
+			deleteNamespaceHasOperators = data.length > 0;
+			namespaceStore.setActiveId(savedActiveId);
+		} catch (e) {
+			deleteNamespaceHasOperators = false;
+		}
+
+		openDeleteNamespaceDialog = true;
+	}
+
+	async function deleteNamespace() {
 		try {
 			deleteNamespaceLoading = true;
-			await new CoroClient().deleteNamespace(namespaceId);
+			await new CoroClient().deleteNamespace(deleteNamespaceId);
 			showSuccess('Namespace deleted');
 
-			const updatedNamespaces = namespaceStore.namespaces.filter((item) => item.id !== namespaceId);
+			const updatedNamespaces = namespaceStore.namespaces.filter((item) => item.id !== deleteNamespaceId);
 			namespaceStore.setNamespaces(updatedNamespaces);
 
 			if (updatedNamespaces.length === 0) {
 				namespaceStore.setActiveId(undefined);
 				await goto('/');
-			} else if (namespaceStore.activeId === namespaceId) {
+			} else if (namespaceStore.activeId === deleteNamespaceId) {
 				const defaultNS = updatedNamespaces.find((item) => item.name === 'default');
 				const newActiveId = defaultNS?.id ?? updatedNamespaces[0].id;
 				namespaceStore.setActiveId(newActiveId);
 				await goto(`/namespaces/${newActiveId}`);
 			}
+			openDeleteNamespaceDialog = false;
 		} catch (e) {
 			showError(e as Error);
 		} finally {
@@ -164,14 +188,9 @@
 										</DropdownMenu.Item>
 										<DropdownMenu.Item
 											class="text-destructive focus:text-destructive"
-											disabled={deleteNamespaceLoading}
-											onclick={() => deleteNamespace(namespace.id)}
+											onclick={() => openDeleteDialog(namespace.id)}
 										>
-											{#if deleteNamespaceLoading}
-												<LoaderCircle class="size-4 animate-spin" />
-											{:else}
-												<Trash2 class="size-4" />
-											{/if}
+											<Trash2 class="size-4" />
 											Delete Namespace
 										</DropdownMenu.Item>
 									</DropdownMenu.SubContent>
@@ -230,5 +249,38 @@
 		namespaceId={editNamespaceId}
 		namespaceName={editNamespaceName}
 	/>
+
+	<AlertDialog.Root bind:open={openDeleteNamespaceDialog}>
+		<AlertDialog.Content>
+			<AlertDialog.Header>
+				<AlertDialog.Title>Are you sure?</AlertDialog.Title>
+				<AlertDialog.Description>
+					This action cannot be undone. This will permanently delete this namespace.
+				</AlertDialog.Description>
+			</AlertDialog.Header>
+			{#if deleteNamespaceHasOperators}
+				<div class="bg-yellow-500/10 border-yellow-500/50 border rounded-md p-3 flex gap-2 items-start">
+					<AlertTriangle class="size-4 text-yellow-600 dark:text-yellow-500 flex-shrink-0 mt-0.5" />
+					<p class="text-sm text-yellow-700 dark:text-yellow-400">All operators belonging to this namespace must first be deleted.</p>
+				</div>
+			{/if}
+			<AlertDialog.Footer>
+				<AlertDialog.Cancel disabled={deleteNamespaceLoading}>Cancel</AlertDialog.Cancel>
+				<Button
+					variant="destructive"
+					onclick={deleteNamespace}
+					disabled={deleteNamespaceLoading || deleteNamespaceHasOperators}
+					class="min-w-24"
+				>
+					{#if deleteNamespaceLoading}
+						<LoaderCircle class="size-4 animate-spin" />
+					{:else}
+						Delete
+					{/if}
+				</Button>
+			</AlertDialog.Footer>
+		</AlertDialog.Content>
+	</AlertDialog.Root>
+
 	<Toaster position="bottom-center" richColors />
 </Tooltip.Provider>

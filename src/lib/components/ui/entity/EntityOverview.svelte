@@ -23,6 +23,7 @@
 		unmanageLabel?: string;
 		unmanageTooltip?: string;
 		additionalNote?: string;
+		requireUnmanageToDelete?: boolean;
 	}
 
 	let {
@@ -39,6 +40,7 @@
 		unmanageLabel,
 		unmanageTooltip,
 		additionalNote,
+		requireUnmanageToDelete = false,
 	}: Props = $props();
 </script>
 
@@ -52,7 +54,15 @@
 				Edit
 			</Button>
 		{/if}
-		<DeleteButton size="sm" {deleteCallback} {allowUnmanage} {unmanageLabel} {unmanageTooltip} {additionalNote} />
+		<DeleteButton
+			size="sm"
+			{deleteCallback}
+			{allowUnmanage}
+			{unmanageLabel}
+			{unmanageTooltip}
+			{additionalNote}
+			{requireUnmanageToDelete}
+		/>
 	</div>
 </div>
 
