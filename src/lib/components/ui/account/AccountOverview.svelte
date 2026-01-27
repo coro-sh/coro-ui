@@ -58,8 +58,8 @@
 		return limits;
 	});
 
-	async function deleteCallback() {
-		await new CoroClient().deleteAccount(account.id);
+	async function deleteCallback(unmanage?: boolean) {
+		await new CoroClient().deleteAccount(account.id, unmanage);
 		await goto(`/namespaces/${namespaceStore.activeId}/operators/${account.operator_id}?tab=3`);
 	}
 </script>
@@ -74,6 +74,8 @@
 	limits={accountLimits}
 	jwt={account?.jwt}
 	{deleteCallback}
+	allowUnmanage={true}
+	unmanageTooltip="Unmanage the account rather than deleting it. This removes the account from Coro Cloud but does not delete any resources in NATS."
 />
 
 {#if account}

@@ -18,7 +18,9 @@
 		limits?: Map<string, unknown> | null;
 		copyableFields?: string[];
 		jwt?: string | null;
-		deleteCallback: () => Promise<void>;
+		deleteCallback: (unmanage?: boolean) => Promise<void>;
+		allowUnmanage?: boolean;
+		unmanageTooltip?: string;
 	}
 
 	let {
@@ -31,6 +33,8 @@
 		copyableFields = [],
 		jwt = null,
 		deleteCallback,
+		allowUnmanage = false,
+		unmanageTooltip,
 	}: Props = $props();
 </script>
 
@@ -44,7 +48,7 @@
 				Edit
 			</Button>
 		{/if}
-		<DeleteButton size="sm" {deleteCallback} />
+		<DeleteButton size="sm" {deleteCallback} {allowUnmanage} {unmanageTooltip} />
 	</div>
 </div>
 
