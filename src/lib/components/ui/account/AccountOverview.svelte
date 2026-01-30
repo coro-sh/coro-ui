@@ -44,7 +44,7 @@
 	const accountLimits = $derived.by(() => {
 		const limits = new Map<(typeof limitFields)[number], unknown>();
 		if (account) {
-			const formatLimit = (val: number | undefined) => (val === -1 ? undefined : val);
+			const formatLimit = (val: number | undefined) => (val === -1 ? 'Unlimited' : val);
 			limits.set('Subscriptions', formatLimit(account.limits.subscriptions));
 			limits.set('Payload Size (KiB)', formatLimit(account.limits.payload_size));
 			limits.set('Imports', formatLimit(account.limits.imports));

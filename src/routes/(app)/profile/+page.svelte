@@ -13,6 +13,11 @@
 	let openDeleteDialog = $state(false);
 	let deleting = $state(false);
 
+	function formatLimit(value: number | undefined): string {
+		if (value === undefined || value === null) return '-';
+		return value === -1 ? 'Unlimited' : value.toString();
+	}
+
 	async function handleDeleteAccount() {
 		try {
 			deleting = true;
@@ -70,16 +75,16 @@
 					<div class="text-muted-foreground mb-3 text-sm font-medium">Resource Limits</div>
 					<div class="grid gap-3">
 						<div class="flex items-center justify-between">
-							<span class="text-sm">Namespaces</span>
-							<span class="font-mono text-sm font-medium">{user.plan.limits.namespaces}</span>
-						</div>
-						<div class="flex items-center justify-between">
 							<span class="text-sm">Operators</span>
-							<span class="font-mono text-sm font-medium">{user.plan.limits.operators}</span>
+							<span class="font-mono text-sm font-medium">{formatLimit(user.plan.limits.operators)}</span>
 						</div>
 						<div class="flex items-center justify-between">
 							<span class="text-sm">Accounts</span>
-							<span class="font-mono text-sm font-medium">{user.plan.limits.accounts}</span>
+							<span class="font-mono text-sm font-medium">{formatLimit(user.plan.limits.accounts)}</span>
+						</div>
+						<div class="flex items-center justify-between">
+							<span class="text-sm">Users</span>
+							<span class="font-mono text-sm font-medium">{formatLimit(user.plan.limits.users)}</span>
 						</div>
 					</div>
 				</div>
