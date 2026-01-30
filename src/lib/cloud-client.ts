@@ -30,6 +30,14 @@ export class CloudClient {
 			headers: { 'Content-Type': 'application/json' },
 		});
 	}
+
+	async deleteAccount(): Promise<void> {
+		await this.client.requestNoContent('/me', {
+			method: 'DELETE',
+		});
+		// Session is already cleared on backend, redirect directly to login
+		window.location.href = API_BASE_URL + '/auth/login';
+	}
 }
 
 export const cloudClient = new CloudClient();
