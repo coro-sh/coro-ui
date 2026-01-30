@@ -122,8 +122,8 @@
 				{/each}
 			{/if}
 			{#if hasMoreIssuances}
-				<Table.Row>
-					<Table.Cell colspan={columns.length} class="pt-4">
+				<Table.Row class="hover:bg-transparent border-0">
+					<Table.Cell colspan={columns.length} class="pt-4 pb-3">
 						<div class="flex justify-center">
 							<Button variant="outline" size="sm" onclick={handleLoadMore} disabled={loadingMore}>
 								{#if loadingMore}

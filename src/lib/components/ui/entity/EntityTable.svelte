@@ -46,9 +46,9 @@
 	{/if}
 </div>
 
-<div class="overflow-x-auto">
+<div class="max-h-[580px] overflow-x-auto overflow-y-auto">
 	<Table.Root>
-		<Table.Header>
+		<Table.Header class="bg-muted sticky top-0">
 			<Table.Row>
 				{#each columns as title}
 					<Table.Head class="font-medium whitespace-nowrap">{title}</Table.Head>
@@ -88,8 +88,8 @@
 				{@render children()}
 			{/if}
 			{#if hasMore}
-				<Table.Row>
-					<Table.Cell colspan={columns.length} class="pt-10">
+				<Table.Row class="hover:bg-transparent border-0">
+					<Table.Cell colspan={columns.length} class="pt-4 pb-3">
 						<div class="flex justify-center">
 							<Button variant="outline" onclick={onloadmore} disabled={loadingMore}>
 								{#if loadingMore}
