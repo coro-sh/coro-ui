@@ -57,6 +57,7 @@ export interface AccountResponse {
 	jwt: string;
 	name: string;
 	public_key: string;
+	create_time: number;
 	limits: AccountLimits;
 }
 

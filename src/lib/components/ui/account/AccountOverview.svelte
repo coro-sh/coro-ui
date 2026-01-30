@@ -5,7 +5,7 @@
 	import { CoroClient } from '$lib/coro-client';
 	import { goto } from '$app/navigation';
 	import { namespaceStore } from '$lib/stores/namespace.svelte';
-	import { formatDuration } from '$lib/utils';
+	import { formatDuration, formatEpoch } from '$lib/utils';
 
 	interface Props {
 		account: AccountResponse;
@@ -17,7 +17,7 @@
 	let openEditModal = $state(false);
 
 	const copyableFields = ['ID', 'Public Key'];
-	const accountFields = ['ID', 'Public Key'] as const;
+	const accountFields = ['ID', 'Public Key', 'Created'] as const;
 	const limitFields = [
 		'Subscriptions',
 		'Payload Size (KiB)',
@@ -32,6 +32,7 @@
 		if (account) {
 			data.set('ID', account.id);
 			data.set('Public Key', account.public_key);
+			data.set('Created', formatEpoch(account.create_time));
 		} else {
 			for (const field of accountFields) {
 				data.set(field, 'Unknown');
