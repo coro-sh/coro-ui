@@ -31,6 +31,14 @@ export class CloudClient {
 		});
 	}
 
+	async updateProfile(name: string): Promise<CloudMeResponse> {
+		return this.client.request<CloudMeResponse>('/me', {
+			method: 'PATCH',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ name }),
+		});
+	}
+
 	async deleteAccount(): Promise<void> {
 		await this.client.requestNoContent('/me', {
 			method: 'DELETE',

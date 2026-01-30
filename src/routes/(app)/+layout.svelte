@@ -5,6 +5,7 @@
 	import { cloudClient } from '$lib/cloud-client';
 	import ErrorLoadResourceSection from '$lib/components/ui/error/ErrorLoadResourceSection.svelte';
 	import LoadingSpinner from '$lib/components/ui/loading/LoadingSpinner.svelte';
+	import CompleteProfileDialog from '$lib/components/ui/profile/CompleteProfileDialog.svelte';
 	import type { Snippet } from 'svelte';
 	import { IS_CLOUD } from '$lib/config/build-target';
 
@@ -15,6 +16,7 @@
 	let { children }: Props = $props();
 
 	let unknownPageNamespace = $state(false);
+	let showCompleteProfile = $state(false);
 
 	$effect(() => {
 		const pageNamespace = page.params.namespace;
@@ -43,6 +45,15 @@
 			cloudClient.login();
 		}
 	});
+
+	// Check if user needs to complete profile
+	$effect(() => {
+		if (IS_CLOUD && authStore.user && !authStore.user.name.trim()) {
+			showCompleteProfile = true;
+		} else {
+			showCompleteProfile = false;
+		}
+	});
 </script>
 
 {#if unknownPageNamespace}
@@ -53,4 +64,8 @@
 	</div>
 {:else}
 	{@render children()}
+{/if}
+
+{#if IS_CLOUD}
+	<CompleteProfileDialog bind:open={showCompleteProfile} />
 {/if}
