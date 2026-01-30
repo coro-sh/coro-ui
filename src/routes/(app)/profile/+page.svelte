@@ -93,7 +93,7 @@
 
 		<Card.Root class="border-destructive">
 			<Card.Header>
-				<Card.Title class="text-destructive">Danger Zone</Card.Title>
+				<Card.Title class="text-destructive dark:text-red-700">Danger Zone</Card.Title>
 				<Card.Description>Irreversible actions that will permanently affect your account</Card.Description>
 			</Card.Header>
 			<Card.Content class="space-y-4">
