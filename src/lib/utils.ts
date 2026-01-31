@@ -19,7 +19,10 @@ export function shortenStr(str?: string, maxLen: number = 30): string {
 	return str.length > maxLen ? `${str.slice(0, maxLen)}...` : str;
 }
 
-export function formatEpoch(epoch: number): string {
+export function formatEpoch(epoch: number | null | undefined): string {
+	if (!epoch || epoch === 0) {
+		return '-';
+	}
 	return new Intl.DateTimeFormat(navigator.language, {
 		year: 'numeric',
 		month: 'short',
@@ -30,7 +33,10 @@ export function formatEpoch(epoch: number): string {
 	}).format(new Date(epoch * 1000));
 }
 
-export function formatTimeSince(timestamp: number): string {
+export function formatTimeSince(timestamp: number | null | undefined): string {
+	if (!timestamp || timestamp === 0) {
+		return '-';
+	}
 	const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
 	const now = Date.now();
 	const diffInSeconds = Math.floor((now - timestamp * 1000) / 1000); // Convert to milliseconds
