@@ -1,7 +1,7 @@
 export interface CloudLimits {
-	namespaces: number;
 	operators: number;
 	accounts: number;
+	users: number;
 }
 
 export interface CloudPlanResponse {

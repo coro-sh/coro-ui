@@ -113,7 +113,7 @@
 					</Table.Cell>
 				</Table.Row>
 			{:else}
-				{#each issuances as iss, i (iss.issue_time)}
+				{#each issuances as iss, i (`${iss.issue_time}-${iss.expire_time}-${i}`)}
 					<Table.Row class={i < issuances.length - 1 ? 'border-b' : ''}>
 						<Table.Cell>{formatEpoch(iss.issue_time)}</Table.Cell>
 						<Table.Cell>{iss.expire_time ? formatEpoch(iss.expire_time) : 'N/A'}</Table.Cell>
@@ -122,8 +122,8 @@
 				{/each}
 			{/if}
 			{#if hasMoreIssuances}
-				<Table.Row>
-					<Table.Cell colspan={columns.length} class="pt-4">
+				<Table.Row class="hover:bg-transparent border-0">
+					<Table.Cell colspan={columns.length} class="pt-4 pb-3">
 						<div class="flex justify-center">
 							<Button variant="outline" size="sm" onclick={handleLoadMore} disabled={loadingMore}>
 								{#if loadingMore}

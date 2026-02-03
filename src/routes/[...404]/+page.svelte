@@ -1,5 +1,6 @@
 <script lang="ts">
 	import ErrorSection from '$lib/components/ui/error/ErrorSection.svelte';
+	import LoadingSpinner from '$lib/components/ui/loading/LoadingSpinner.svelte';
 	import { IS_CLOUD } from '$lib/config/build-target';
 	import { authStore } from '$lib/stores/auth.svelte';
 	import { cloudClient } from '$lib/cloud-client';
@@ -13,9 +14,8 @@
 </script>
 
 {#if IS_CLOUD && !authStore.isAuthenticated}
-	<!-- Show nothing while redirecting to login -->
-	<div class="flex h-screen items-center justify-center">
-		<div class="text-muted-foreground">Redirecting to login...</div>
+	<div class="fixed inset-0 flex items-center justify-center">
+		<LoadingSpinner message="Redirecting to login..." />
 	</div>
 {:else}
 	<ErrorSection

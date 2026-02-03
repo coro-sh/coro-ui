@@ -7,6 +7,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
+	import * as Dialog from '$lib/components/ui/dialog';
 	import ThemeToggle from '$lib/components/ui/theme/ThemeToggle.svelte';
 	import CreateNamespaceModal from '$lib/components/ui/namespace/CreateNamespaceModal.svelte';
 	import EditNamespaceModal from '$lib/components/ui/namespace/EditNamespaceModal.svelte';
@@ -25,6 +26,7 @@
 	import LogOut from '@lucide/svelte/icons/log-out';
 	import User from '@lucide/svelte/icons/user';
 	import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
+	import Bug from '@lucide/svelte/icons/bug';
 	import { IS_CLOUD } from '$lib/config/build-target';
 	import { cloudClient } from '$lib/cloud-client';
 	import { authStore } from '$lib/stores/auth.svelte';
@@ -65,6 +67,7 @@
 	let openDeleteNamespaceDialog = $state(false);
 	let deleteNamespaceId = $state('');
 	let deleteNamespaceHasOperators = $state(false);
+	let openReportIssueDialog = $state(false);
 
 	const logoImage = $derived(mode.current === 'dark' ? 'logo-dark.svg' : 'logo-light.svg');
 	const activeNamespaceName = $derived(
@@ -212,10 +215,23 @@
 								</Button>
 							{/snippet}
 						</DropdownMenu.Trigger>
-						<DropdownMenu.Content align="end" class="w-48">
+						<DropdownMenu.Content align="end" class="w-56">
+							<DropdownMenu.Label>
+								<div class="flex flex-col space-y-1">
+									{#if authStore.user.name}
+										<p class="text-sm font-medium leading-none">{authStore.user.name}</p>
+									{/if}
+									<p class="text-muted-foreground text-xs leading-none">{authStore.user.email}</p>
+								</div>
+							</DropdownMenu.Label>
+							<DropdownMenu.Separator />
 							<DropdownMenu.Item onclick={() => goto('/profile')}>
 								<User class="size-4" />
 								Profile
+							</DropdownMenu.Item>
+							<DropdownMenu.Item onclick={() => (openReportIssueDialog = true)}>
+								<Bug class="size-4" />
+								Report an Issue
 							</DropdownMenu.Item>
 							<DropdownMenu.Separator />
 							<DropdownMenu.Item onclick={() => cloudClient.logout()}>
@@ -281,6 +297,33 @@
 			</AlertDialog.Footer>
 		</AlertDialog.Content>
 	</AlertDialog.Root>
+
+	<Dialog.Root bind:open={openReportIssueDialog}>
+		<Dialog.Content>
+			<Dialog.Header>
+				<Dialog.Title>Report an Issue</Dialog.Title>
+				<Dialog.Description>
+					Need help or found a bug? We're here to assist you.
+				</Dialog.Description>
+			</Dialog.Header>
+			<div class="space-y-4 py-2">
+				<p class="text-sm">
+					Send an email to <a href="mailto:support@coro.sh" class="text-primary font-medium hover:underline">support@coro.sh</a> and include:
+				</p>
+				<ul class="text-muted-foreground list-disc list-inside space-y-1 text-sm">
+					<li>A detailed description of the issue</li>
+					<li>Steps to reproduce the problem</li>
+					<li>Any relevant screenshots or error messages</li>
+					<li>Your Coro Cloud account email for faster assistance</li>
+				</ul>
+			</div>
+			<Dialog.Footer>
+				<Button onclick={() => (openReportIssueDialog = false)} class="w-full">
+					Got it
+				</Button>
+			</Dialog.Footer>
+		</Dialog.Content>
+	</Dialog.Root>
 
 	<Toaster position="bottom-center" richColors />
 </Tooltip.Provider>

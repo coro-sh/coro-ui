@@ -37,7 +37,7 @@
 	const userLimits = $derived.by(() => {
 		const limits = new Map<(typeof limitFields)[number], unknown>();
 		if (user) {
-			const formatLimit = (val: number | undefined) => (val === -1 ? undefined : val);
+			const formatLimit = (val: number | undefined) => (val === -1 ? 'Unlimited' : val);
 			limits.set('Subscriptions', formatLimit(user.limits.subscriptions));
 			limits.set('Payload Size (KiB)', formatLimit(user.limits.payload_size));
 

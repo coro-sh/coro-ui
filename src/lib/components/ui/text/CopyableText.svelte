@@ -15,7 +15,8 @@
 	const shortenedText = $derived(shortenStr(text, maxLen));
 	const isTruncated = $derived(shortenedText.length < text.length);
 
-	function handleCopy() {
+	function handleCopy(event: MouseEvent) {
+		event.stopPropagation();
 		navigator.clipboard.writeText(text).then(() => {
 			showCopied();
 		});
@@ -32,7 +33,12 @@
 				tabindex="0"
 				aria-label="Copy to clipboard"
 				onclick={handleCopy}
-				onkeydown={(e) => e.key === 'Enter' && handleCopy()}
+				onkeydown={(e) => {
+					if (e.key === 'Enter') {
+						e.stopPropagation();
+						navigator.clipboard.writeText(text).then(() => showCopied());
+					}
+				}}
 			>
 				{shortenedText}
 			</span>
@@ -49,7 +55,12 @@
 		tabindex="0"
 		aria-label="Copy to clipboard"
 		onclick={handleCopy}
-		onkeydown={(e) => e.key === 'Enter' && handleCopy()}
+		onkeydown={(e) => {
+			if (e.key === 'Enter') {
+				e.stopPropagation();
+				navigator.clipboard.writeText(text).then(() => showCopied());
+			}
+		}}
 	>
 		{text}
 	</span>

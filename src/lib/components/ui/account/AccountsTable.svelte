@@ -5,6 +5,7 @@
 	import EntityTableRow from '$lib/components/ui/entity/EntityTableRow.svelte';
 	import CopyableText from '$lib/components/ui/text/CopyableText.svelte';
 	import { namespaceStore } from '$lib/stores/namespace.svelte';
+	import { formatEpoch } from '$lib/utils';
 
 	interface Props {
 		loading?: boolean;
@@ -24,7 +25,7 @@
 		onloadmore,
 	}: Props = $props();
 
-	const columns = ['ID', 'Name', 'Public Key', ''];
+	const columns = ['ID', 'Name', 'Public Key', 'Created', ''];
 </script>
 
 <EntityTable
@@ -49,6 +50,7 @@
 			<Table.Cell>
 				<CopyableText spanId={`account-pk-${acc.id}`} text={acc.public_key ?? ''} />
 			</Table.Cell>
+			<Table.Cell>{formatEpoch(acc.create_time)}</Table.Cell>
 		</EntityTableRow>
 	{/each}
 </EntityTable>

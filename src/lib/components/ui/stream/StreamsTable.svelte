@@ -28,9 +28,9 @@
 	<h2 class="text-xl font-semibold sm:text-2xl">Streams</h2>
 </div>
 
-<div class="overflow-x-auto">
+<div class="max-h-[580px] overflow-x-auto overflow-y-auto">
 	<Table.Root>
-		<Table.Header>
+		<Table.Header class="bg-muted sticky top-0">
 			<Table.Row>
 				{#each columns as title}
 					<Table.Head class="font-medium whitespace-nowrap">{title}</Table.Head>

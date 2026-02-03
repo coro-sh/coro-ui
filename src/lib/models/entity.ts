@@ -57,6 +57,7 @@ export interface AccountResponse {
 	jwt: string;
 	name: string;
 	public_key: string;
+	create_time: number;
 	limits: AccountLimits;
 }
 
@@ -79,6 +80,65 @@ export interface UserIssuanceResponse {
 export interface OperatorStatus {
 	connected: boolean;
 	connect_time?: number;
+}
+
+export interface ServerStatsMsg {
+	server: ServerInfo;
+	statsz: ServerStats;
+}
+
+export interface ServerInfo {
+	name: string;
+	host: string;
+	id: string;
+	cluster?: string;
+	domain?: string;
+	ver: string;
+	tags?: string[];
+	jetstream: boolean;
+	flags: number;
+	seq: number;
+	time: string;
+}
+
+export interface ServerStats {
+	start: string;
+	mem: number;
+	cores: number;
+	cpu: number;
+	connections: number;
+	total_connections: number;
+	active_accounts: number;
+	subscriptions: number;
+	sent: DataStats;
+	received: DataStats;
+	slow_consumers: number;
+	routes?: RouteStat[];
+	gateways?: GatewayStat[];
+	active_servers?: number;
+	gomemlimit?: number;
+	gomaxprocs?: number;
+}
+
+export interface DataStats {
+	msgs: number;
+	bytes: number;
+}
+
+export interface RouteStat {
+	rid: number;
+	name?: string;
+	sent: DataStats;
+	received: DataStats;
+	pending: number;
+}
+
+export interface GatewayStat {
+	gwid: number;
+	name: string;
+	sent: DataStats;
+	received: DataStats;
+	inbound_connections: number;
 }
 
 export interface AccountLimits {
