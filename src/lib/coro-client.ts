@@ -6,6 +6,7 @@ import type {
 	OperatorProxyTokenResponse,
 	OperatorResponse,
 	OperatorStatus,
+	ServerStatsMsg,
 	Stream,
 	StreamMessage,
 	StreamMessageContent,
@@ -268,6 +269,16 @@ export class CoroClient {
 				method: 'GET',
 				headers: { 'Content-Type': 'application/json' },
 				body: null,
+			}
+		);
+	}
+
+	async fetchOperatorStats(operatorId: string): Promise<ServerStatsMsg> {
+		return this.client.request<ServerStatsMsg>(
+			`/namespaces/${namespaceStore.activeId}/operators/${operatorId}/stats`,
+			{
+				method: 'GET',
+				headers: { 'Content-Type': 'application/json' },
 			}
 		);
 	}
