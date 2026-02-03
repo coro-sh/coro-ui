@@ -6,13 +6,14 @@
 	import CreateAccountModal from '$lib/components/ui/account/CreateAccountModal.svelte';
 	import CodeBlock from '$lib/components/ui/text/CodeBlock.svelte';
 	import OperatorOverview from '$lib/components/ui/operator/OperatorOverview.svelte';
+	import OperatorStats from '$lib/components/ui/operator/OperatorStats.svelte';
 	import TabGroup from '$lib/components/ui/tab/TabGroup.svelte';
 	import TabCard from '$lib/components/ui/tab/TabCard.svelte';
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
 	import ErrorLoadResourceSection from '$lib/components/ui/error/ErrorLoadResourceSection.svelte';
 	import { onMount } from 'svelte';
 	import { CoroClient } from '$lib/coro-client';
-	import type { AccountResponse, OperatorResponse } from '$lib/models/entity';
+	import type { AccountResponse, OperatorResponse, ServerStatsMsg } from '$lib/models/entity';
 	import { page } from '$app/state';
 	import { downloadFile } from '$lib/utils';
 	import { showError, showSuccess } from '$lib/stores/toast';
@@ -34,6 +35,7 @@
 	let loadingProxyToken = $state(false);
 	let loadingTestConnection = $state(false);
 	let loadingMoreAccounts = $state(false);
+	let loadingStats = $state(true);
 	let loadFailed = $state(false);
 	let openCreateAccount = $state(false);
 	let operator = $state<OperatorResponse | undefined>(undefined);
@@ -41,6 +43,7 @@
 	let hasMoreAccounts = $state(false);
 	let natsConfig = $state('');
 	let proxyToken = $state('');
+	let stats = $state<ServerStatsMsg | undefined>(undefined);
 
 	let proxyAgentCmd = $state(
 		IS_CLOUD
@@ -63,6 +66,20 @@
 			await fetchNextAccountsPage();
 			loadingNatsConfig = true;
 			natsConfig = await client.fetchNATSConfigContent(operatorId);
+			// Fetch stats only if operator is connected
+			if (operator.status.connected) {
+				loadingStats = true;
+				try {
+					stats = await client.fetchOperatorStats(operatorId);
+				} catch (e) {
+					console.error('Failed to fetch operator stats:', e);
+					// Don't show error toast for stats, just log it
+				} finally {
+					loadingStats = false;
+				}
+			} else {
+				loadingStats = false;
+			}
 		} catch (e) {
 			showError(e as Error);
 			loadFailed = true;
@@ -165,28 +182,32 @@
 						{/if}
 					</TabCard>
 				{:else if tab === 2}
-					<TabCard>
-						{#if loading}
+					{#if loading}
+						<TabCard>
 							<div class="space-y-4">
 								{#each { length: 5 } as _}
 									<Skeleton class="h-4 w-full" />
 								{/each}
 							</div>
-						{:else if operator?.status.connected}
-							<div class="mb-8 flex items-center justify-between">
-								<div class="flex items-center gap-2">
-									<h2 class="text-xl font-semibold sm:text-2xl">NATS Server</h2>
-									<Badge variant="success" class="mt-0.5 flex items-center gap-1">
-										<Circle class="size-1.5! fill-current" />
-										Connected
-									</Badge>
+						</TabCard>
+					{:else if operator?.status.connected}
+						<div class="space-y-6">
+							<!-- Stats -->
+							<OperatorStats bind:loading={loadingStats} bind:stats {operator} />
+
+							<!-- Server Configuration -->
+							<TabCard>
+								<div class="mb-4">
+									<h2 class="text-xl font-semibold sm:text-2xl">Server Configuration</h2>
+									<p class="text-muted-foreground mt-1 text-sm">
+										NATS server configuration for this operator
+									</p>
 								</div>
-							</div>
-
-							<p class="text-muted-foreground mb-5">Connected with the server config below.</p>
-
-							<CodeBlock loading={loadingNatsConfig} content={natsConfig} wrap />
-						{:else}
+								<CodeBlock loading={loadingNatsConfig} content={natsConfig} wrap />
+							</TabCard>
+						</div>
+					{:else}
+						<TabCard>
 							<div
 								class="bg-muted/30 dark:bg-muted/50 -mx-2 -mt-2 mb-6 flex items-center justify-center gap-3 rounded-lg p-4"
 							>
@@ -316,8 +337,8 @@
 									</div>
 								</div>
 							</div>
-						{/if}
-					</TabCard>
+						</TabCard>
+					{/if}
 				{:else if tab === 3}
 					<TabCard>
 						<AccountsTable
