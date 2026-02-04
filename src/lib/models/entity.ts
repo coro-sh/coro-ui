@@ -59,6 +59,7 @@ export interface AccountResponse {
 	public_key: string;
 	create_time: number;
 	limits: AccountLimits;
+	stats?: AccountStat;
 }
 
 export interface UserResponse {
@@ -154,6 +155,23 @@ export interface UserLimits {
 	subscriptions?: number;
 	payload_size?: number;
 	jwt_duration_secs?: number;
+}
+
+export interface DataStats {
+	msgs: number;
+	bytes: number;
+}
+
+export interface AccountStat {
+	acc: string;
+	name: string;
+	conns: number;
+	leafnodes: number;
+	total_conns: number;
+	num_subscriptions: number;
+	sent: DataStats;
+	received: DataStats;
+	slow_consumers: number;
 }
 
 export interface OperatorProxyTokenResponse {

@@ -3,6 +3,7 @@
 	import UsersTable from '$lib/components/ui/user/UsersTable.svelte';
 	import StreamsTable from '$lib/components/ui/stream/StreamsTable.svelte';
 	import AccountOverview from '$lib/components/ui/account/AccountOverview.svelte';
+	import AccountStats from '$lib/components/ui/account/AccountStats.svelte';
 	import TabGroup from '$lib/components/ui/tab/TabGroup.svelte';
 	import TabCard from '$lib/components/ui/tab/TabCard.svelte';
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
@@ -152,11 +153,14 @@
 		<TabGroup tabNames={['Overview', 'Users', 'Streams']}>
 			{#snippet children(tab)}
 				{#if tab === 1}
-					<TabCard>
-						{#if account}
-							<AccountOverview bind:loading bind:account />
-						{/if}
-					</TabCard>
+					<div class="space-y-6">
+						<TabCard>
+							{#if account}
+								<AccountOverview bind:loading bind:account />
+							{/if}
+						</TabCard>
+						<AccountStats stats={account?.stats} {loading} />
+					</div>
 				{:else if tab === 2}
 					<TabCard>
 						<UsersTable
