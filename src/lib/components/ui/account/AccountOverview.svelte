@@ -10,9 +10,10 @@
 	interface Props {
 		account: AccountResponse;
 		loading?: boolean;
+		showDeleteButton?: boolean;
 	}
 
-	let { account = $bindable(), loading = $bindable(true) }: Props = $props();
+	let { account = $bindable(), loading = $bindable(true), showDeleteButton = true }: Props = $props();
 
 	let openEditModal = $state(false);
 
@@ -72,9 +73,9 @@
 	name={account?.name}
 	{copyableFields}
 	data={accountData}
-	limits={accountLimits}
 	jwt={account?.jwt}
 	{deleteCallback}
+	{showDeleteButton}
 	allowUnmanage={true}
 	unmanageLabel="Unmanage Account"
 	unmanageTooltip="Unmanage the account rather than deleting it. This removes the account from Coro but does not delete any resources in NATS."

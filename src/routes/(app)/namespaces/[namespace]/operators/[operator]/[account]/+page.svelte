@@ -1,9 +1,11 @@
 <script lang="ts">
 	import { Skeleton } from '$lib/components/ui/skeleton';
+	import { Button } from '$lib/components/ui/button';
 	import UsersTable from '$lib/components/ui/user/UsersTable.svelte';
 	import StreamsTable from '$lib/components/ui/stream/StreamsTable.svelte';
 	import AccountOverview from '$lib/components/ui/account/AccountOverview.svelte';
 	import AccountStats from '$lib/components/ui/account/AccountStats.svelte';
+	import EditAccountModal from '$lib/components/ui/account/EditAccountModal.svelte';
 	import TabGroup from '$lib/components/ui/tab/TabGroup.svelte';
 	import TabCard from '$lib/components/ui/tab/TabCard.svelte';
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
@@ -17,6 +19,7 @@
 	import { showError } from '$lib/stores/toast';
 
 	import Home from '@lucide/svelte/icons/home';
+	import Pencil from '@lucide/svelte/icons/pencil';
 
 	const namespaceId = $derived(page.params.namespace ?? '');
 	const operatorId = $derived(page.params.operator ?? '');
@@ -32,6 +35,7 @@
 	let loadingStreams = $state(false);
 	let loadFailed = $state(false);
 	let openCreateUser = $state(false);
+	let openEditModal = $state(false);
 	let streamsFetched = $state(false);
 	let operator = $state<OperatorResponse | undefined>(undefined);
 	let account = $state<AccountResponse | undefined>(undefined);
@@ -57,7 +61,7 @@
 	});
 
 	$effect(() => {
-		// Fetch streams when tab 3 is active and we haven't fetched yet
+		// Fetch streams when Streams tab is active and we haven't fetched yet
 		if (activeTab === 3 && operator?.status.connected && !streamsFetched && !loadingStreams) {
 			void fetchStreams();
 		}
@@ -154,12 +158,104 @@
 			{#snippet children(tab)}
 				{#if tab === 1}
 					<div class="space-y-6">
+						<!-- Overview Card -->
 						<TabCard>
 							{#if account}
 								<AccountOverview bind:loading bind:account />
 							{/if}
 						</TabCard>
+
+						<!-- Metrics Card -->
 						<AccountStats stats={account?.stats} {loading} />
+
+						<!-- Limits Card -->
+						<TabCard>
+							<div class="mb-4 flex items-center justify-between">
+								<h2 class="text-foreground text-xl font-semibold sm:text-2xl">Limits</h2>
+								<Button variant="outline" size="sm" onclick={() => (openEditModal = true)}>
+									<Pencil class="size-4" />
+									Edit
+								</Button>
+							</div>
+							{#if loading}
+								<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+									{#each { length: 6 } as _}
+										<div class="border-border bg-muted/60 rounded-lg border p-4">
+											<Skeleton class="mb-2 h-4 w-24" />
+											<Skeleton class="h-6 w-32" />
+										</div>
+									{/each}
+								</div>
+							{:else if account}
+								<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+									<!-- Max Connections -->
+									<div class="border-border bg-muted/60 rounded-lg border p-4">
+										<div class="text-muted-foreground mb-1 text-sm">Max Connections</div>
+										<div class="text-foreground text-xl font-semibold">
+											{account.limits.connections ?? 'Unlimited'}
+										</div>
+										{#if account.limits.connections && account.stats}
+											<div class="text-muted-foreground mt-1 text-xs">
+												{account.stats.conns} / {account.limits.connections} used
+											</div>
+										{/if}
+									</div>
+
+									<!-- Max Subscriptions -->
+									<div class="border-border bg-muted/60 rounded-lg border p-4">
+										<div class="text-muted-foreground mb-1 text-sm">Max Subscriptions</div>
+										<div class="text-foreground text-xl font-semibold">
+											{account.limits.subscriptions ?? 'Unlimited'}
+										</div>
+										{#if account.limits.subscriptions && account.stats}
+											<div class="text-muted-foreground mt-1 text-xs">
+												{account.stats.num_subscriptions} / {account.limits.subscriptions} used
+											</div>
+										{/if}
+									</div>
+
+									<!-- Max Payload Size -->
+									<div class="border-border bg-muted/60 rounded-lg border p-4">
+										<div class="text-muted-foreground mb-1 text-sm">Max Payload Size</div>
+										<div class="text-foreground text-xl font-semibold">
+											{#if account.limits.payload_size}
+												{Math.round(account.limits.payload_size / 1024)} KB
+											{:else}
+												Unlimited
+											{/if}
+										</div>
+									</div>
+
+									<!-- Max Imports -->
+									<div class="border-border bg-muted/60 rounded-lg border p-4">
+										<div class="text-muted-foreground mb-1 text-sm">Max Imports</div>
+										<div class="text-foreground text-xl font-semibold">
+											{account.limits.imports ?? 'Unlimited'}
+										</div>
+									</div>
+
+									<!-- Max Exports -->
+									<div class="border-border bg-muted/60 rounded-lg border p-4">
+										<div class="text-muted-foreground mb-1 text-sm">Max Exports</div>
+										<div class="text-foreground text-xl font-semibold">
+											{account.limits.exports ?? 'Unlimited'}
+										</div>
+									</div>
+
+									<!-- User JWT Duration -->
+									<div class="border-border bg-muted/60 rounded-lg border p-4">
+										<div class="text-muted-foreground mb-1 text-sm">User JWT Duration</div>
+										<div class="text-foreground text-xl font-semibold">
+											{#if account.limits.user_jwt_duration_secs}
+												{Math.floor(account.limits.user_jwt_duration_secs / 3600)} hours
+											{:else}
+												No expiry
+											{/if}
+										</div>
+									</div>
+								</div>
+							{/if}
+						</TabCard>
 					</div>
 				{:else if tab === 2}
 					<TabCard>
@@ -196,3 +292,7 @@
 	accountId={account?.id ?? ''}
 	accountUserJWTLifetime={account?.limits.user_jwt_duration_secs}
 />
+
+{#if account}
+	<EditAccountModal bind:open={openEditModal} bind:account />
+{/if}

@@ -4,12 +4,11 @@
 	import { Badge } from '$lib/components/ui/badge';
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
 	import { Skeleton } from '$lib/components/ui/skeleton';
-	import More from '$lib/components/ui/nav/More.svelte';
 	import ErrorLoadResourceSection from '$lib/components/ui/error/ErrorLoadResourceSection.svelte';
 	import { namespaceStore } from '$lib/stores/namespace.svelte';
 	import { showError } from '$lib/stores/toast';
 	import { CoroClient, type Paginator } from '$lib/coro-client';
-	import { formatEpoch } from '$lib/utils';
+	import { formatDurationCompact } from '$lib/utils';
 	import { onMount } from 'svelte';
 	import { page } from '$app/state';
 	import type { OperatorResponse } from '$lib/models/entity';
@@ -19,6 +18,8 @@
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import Home from '@lucide/svelte/icons/home';
 	import Circle from '@lucide/svelte/icons/circle';
+	import Server from '@lucide/svelte/icons/server';
+	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 
 	import CreateOperatorModal from '$lib/components/ui/operator/CreateOperatorModal.svelte';
 
@@ -130,14 +131,21 @@
 				</div>
 			{:else if loading && !operators.length}
 				<!-- Loading skeleton -->
-				<div class="mb-2 grid grid-cols-1 gap-4 xl:grid-cols-3">
+				<div class="mb-2 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
 					{#each { length: 3 } as _}
 						<Card.Root>
-							<Card.Content class="space-y-4 pt-6">
-								<Skeleton class="h-6 w-32" />
-								<Skeleton class="h-4 w-full" />
-								<Skeleton class="h-4 w-3/4" />
-								<Skeleton class="h-6 w-24" />
+							<Card.Content class="pt-6">
+								<!-- Icon and Title Row -->
+								<div class="flex items-start gap-4">
+									<Skeleton class="size-12 flex-shrink-0 rounded-lg" />
+									<Skeleton class="h-7 flex-1" />
+								</div>
+
+								<!-- Status skeleton -->
+								<div class="mt-4 flex items-center gap-2 pt-2">
+									<Skeleton class="h-6 w-32" />
+									<Skeleton class="h-4 w-24" />
+								</div>
 							</Card.Content>
 						</Card.Root>
 					{/each}
@@ -148,31 +156,49 @@
 					{#each operators as operator (operator.id)}
 						<a
 							href={`/namespaces/${namespaceStore.activeId}/operators/${operator.id}`}
-							class="block"
+							class="group block"
 						>
 							<Card.Root class="hover:bg-accent/50 relative transition-colors">
-								<Card.Content class="pt-6">
-									<div class="flex items-center justify-between">
-										<h3 class="text-foreground -mt-6.5 truncate pr-8 text-2xl font-semibold">
+								<Card.Content	>
+									<!-- Icon, Title, and Chevron Row -->
+									<div class="mb-6 flex items-center gap-4">
+										<div
+											class="flex size-11 shrink-0 items-center justify-center rounded-xl transition-colors bg-primary/10 text-primary group-hover:bg-primary/15"
+										>
+											<Server class="size-6" />
+										</div>
+										<h3 class="text-foreground flex-1 truncate text-2xl font-semibold">
 											{operator.name}
 										</h3>
-										<div class="absolute top-4 right-4">
-											<More />
-										</div>
+										<ChevronRight
+											class="text-primary size-7 shrink-0 transition-transform group-hover:translate-x-1"
+										/>
 									</div>
-									<div class="mt-5 flex items-center gap-2 pt-3">
-										<Badge
-											variant={operator.status.connected ? 'success' : 'destructive'}
-											class="flex items-center gap-1"
-										>
-											<Circle class="size-1.5! fill-current" />
-											NATS {operator.status.connected ? 'Connected' : 'Disconnected'}
-										</Badge>
-										{#if operator.status.connected && operator.status.connect_time}
-											<span class="text-muted-foreground text-xs">
-												{formatEpoch(operator.status.connect_time)}
-											</span>
-										{/if}
+
+									<!-- Status section with darker background -->
+									<div class="{operator.status.connected ? 'bg-primary/5 border-primary/20' : 'bg-muted/40'} border-[0.5px] rounded-2xl p-2">
+										<div class="flex items-center gap-3">
+											<Badge
+												variant={operator.status.connected ? 'success' : 'neutral'}
+												class="flex items-center gap-1.5"
+											>
+												<Circle class="size-1.5! fill-current" />
+												{operator.status.connected ? 'Connected' : 'Disconnected'}
+											</Badge>
+											{#if operator.status.connected && operator.status.connect_time}
+												<span class="text-emerald-800 dark:text-emerald-500/80 text-sm">
+													Online for {formatDurationCompact(Math.floor(Date.now() / 1000) - operator.status.connect_time)}
+												</span>
+											{:else if operator.last_connect_time}
+												<span class="text-muted-foreground text-sm">
+													Last online {formatDurationCompact(Math.floor(Date.now() / 1000) - operator.last_connect_time)} ago
+												</span>
+											{:else}
+												<span class="text-muted-foreground text-sm">
+													No history
+												</span>
+											{/if}
+										</div>
 									</div>
 								</Card.Content>
 							</Card.Root>

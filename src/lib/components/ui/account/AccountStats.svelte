@@ -8,6 +8,7 @@
 	import Download from '@lucide/svelte/icons/download';
 	import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
 	import Network from '@lucide/svelte/icons/network';
+	import Zap from '@lucide/svelte/icons/zap';
 
 	interface Props {
 		stats?: AccountStat;
@@ -15,6 +16,19 @@
 	}
 
 	let { stats, loading = false }: Props = $props();
+
+	// Use zero values if stats are not available
+	const displayStats = $derived(
+		stats ?? {
+			conns: 0,
+			total_conns: 0,
+			leafnodes: 0,
+			num_subscriptions: 0,
+			slow_consumers: 0,
+			sent: { bytes: 0, msgs: 0 },
+			received: { bytes: 0, msgs: 0 },
+		}
+	);
 
 	function formatBytes(bytes: number): string {
 		if (bytes === 0) return '0 B';
@@ -44,13 +58,6 @@
 				{/each}
 			</div>
 		</TabCard>
-	{:else if !stats}
-		<TabCard>
-			<p class="text-muted-foreground text-sm">
-				No metrics available. Metrics are only available when the operator NATS server is
-				connected and the account has active connections.
-			</p>
-		</TabCard>
 	{:else}
 		<TabCard>
 			<div class="mb-4">
@@ -64,10 +71,18 @@
 						<span class="text-muted-foreground text-sm">Connections</span>
 					</div>
 					<div class="text-foreground text-2xl font-bold">
-						{formatNumber(stats.conns)}
+						{formatNumber(displayStats.conns)}
 					</div>
-					<div class="text-muted-foreground mt-1 text-xs">
-						{formatNumber(stats.total_conns)} total
+				</div>
+
+				<!-- Total Connections -->
+				<div class="border-border bg-muted/60 rounded-lg border p-4">
+					<div class="mb-2 flex items-center gap-2">
+						<Activity class="text-primary size-4" />
+						<span class="text-muted-foreground text-sm">Total Connections</span>
+					</div>
+					<div class="text-foreground text-2xl font-bold">
+						{formatNumber(displayStats.total_conns)}
 					</div>
 				</div>
 
@@ -78,7 +93,7 @@
 						<span class="text-muted-foreground text-sm">Leaf Nodes</span>
 					</div>
 					<div class="text-foreground text-2xl font-bold">
-						{formatNumber(stats.leafnodes)}
+						{formatNumber(displayStats.leafnodes)}
 					</div>
 				</div>
 
@@ -89,7 +104,7 @@
 						<span class="text-muted-foreground text-sm">Subscriptions</span>
 					</div>
 					<div class="text-foreground text-2xl font-bold">
-						{formatNumber(stats.num_subscriptions)}
+						{formatNumber(displayStats.num_subscriptions)}
 					</div>
 				</div>
 
@@ -100,7 +115,7 @@
 						<span class="text-muted-foreground text-sm">Slow Consumers</span>
 					</div>
 					<div class="text-foreground text-2xl font-bold">
-						{formatNumber(stats.slow_consumers)}
+						{formatNumber(displayStats.slow_consumers)}
 					</div>
 				</div>
 
@@ -111,10 +126,10 @@
 						<span class="text-muted-foreground text-sm">Sent</span>
 					</div>
 					<div class="text-foreground text-2xl font-bold">
-						{formatBytes(stats.sent.bytes)}
+						{formatBytes(displayStats.sent.bytes)}
 					</div>
 					<div class="text-muted-foreground mt-1 text-xs">
-						{formatNumber(stats.sent.msgs)} messages
+						{formatNumber(displayStats.sent.msgs)} messages
 					</div>
 				</div>
 
@@ -125,10 +140,21 @@
 						<span class="text-muted-foreground text-sm">Received</span>
 					</div>
 					<div class="text-foreground text-2xl font-bold">
-						{formatBytes(stats.received.bytes)}
+						{formatBytes(displayStats.received.bytes)}
 					</div>
 					<div class="text-muted-foreground mt-1 text-xs">
-						{formatNumber(stats.received.msgs)} messages
+						{formatNumber(displayStats.received.msgs)} messages
+					</div>
+				</div>
+
+				<!-- Total Messages -->
+				<div class="border-border bg-muted/60 rounded-lg border p-4">
+					<div class="mb-2 flex items-center gap-2">
+						<Zap class="text-primary size-4" />
+						<span class="text-muted-foreground text-sm">Total Messages</span>
+					</div>
+					<div class="text-foreground text-2xl font-bold">
+						{formatNumber(displayStats.sent.msgs + displayStats.received.msgs)}
 					</div>
 				</div>
 			</div>

@@ -9,9 +9,10 @@
 	interface Props {
 		operator: OperatorResponse;
 		loading?: boolean;
+		showDeleteButton?: boolean;
 	}
 
-	let { operator = $bindable(), loading = $bindable(true) }: Props = $props();
+	let { operator = $bindable(), loading = $bindable(true), showDeleteButton = true }: Props = $props();
 
 	let openEditModal = $state(false);
 	let hasAccounts = $state(false);
@@ -64,6 +65,7 @@
 	data={operatorData}
 	jwt={operator?.jwt}
 	{deleteCallback}
+	{showDeleteButton}
 	allowUnmanage={hasAccounts}
 	unmanageLabel="Unmanage Accounts"
 	unmanageTooltip="Unmanage all accounts belonging to this operator. This removes the accounts from Coro but does not delete any resources in NATS."

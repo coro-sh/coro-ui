@@ -11,7 +11,9 @@
 				destructive:
 					'bg-red-100 text-red-700 dark:bg-red-800/30 dark:text-red-400 border-transparent py-1 px-2.5',
 				success:
-					'bg-emerald-100 text-emerald-700 dark:bg-emerald-700/30 dark:text-emerald-400 border-transparent py-1 px-2.5',
+					'bg-emerald-200/40 text-emerald-700 dark:bg-emerald-700/30 dark:text-emerald-400 border-transparent py-1 px-2.5',
+				neutral:
+					'bg-neutral-300/30 text-muted-foreground dark:bg-neutral-700/40 dark:text-muted-foreground border-transparent py-1 px-2.5',
 				outline: 'text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground',
 			},
 		},

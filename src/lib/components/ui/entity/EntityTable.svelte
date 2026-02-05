@@ -47,7 +47,7 @@
 </div>
 
 <div class="border-border overflow-hidden rounded-lg border">
-	<div class="max-h-[580px] overflow-x-auto overflow-y-auto">
+	<div class="max-h-145 overflow-x-auto overflow-y-auto">
 		<Table.Root>
 			<Table.Header class="bg-muted/50 sticky top-0 z-10 border-b">
 				<Table.Row class="hover:bg-transparent">

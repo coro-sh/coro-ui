@@ -81,6 +81,26 @@ export function formatDuration(seconds?: number): string {
 		.join(', ');
 }
 
+export function formatDurationCompact(seconds: number): string {
+	if (seconds === 0) return '0 secs';
+
+	const days = Math.floor(seconds / 86400);
+	const hours = Math.floor((seconds % 86400) / 3600);
+	const minutes = Math.floor((seconds % 3600) / 60);
+	const secs = seconds % 60;
+
+	if (days > 0) {
+		return hours > 0 ? `${days} days, ${hours} hrs` : `${days} ${days === 1 ? 'day' : 'days'}`;
+	}
+	if (hours > 0) {
+		return minutes > 0 ? `${hours} hrs, ${minutes} mins` : `${hours} ${hours === 1 ? 'hr' : 'hrs'}`;
+	}
+	if (minutes > 0) {
+		return `${minutes} ${minutes === 1 ? 'min' : 'mins'}`;
+	}
+	return `${secs} ${secs === 1 ? 'sec' : 'secs'}`;
+}
+
 export function upperCaseFirstChar(str: string): string {
 	if (!str) return '';
 	return str.charAt(0).toUpperCase() + str.slice(1);

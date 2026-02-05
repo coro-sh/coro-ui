@@ -12,8 +12,8 @@
 	import StopCircle from '@lucide/svelte/icons/stop-circle';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import ArrowDown from '@lucide/svelte/icons/arrow-down';
-	import Eye from '@lucide/svelte/icons/eye';
 	import Circle from '@lucide/svelte/icons/circle';
+	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import { onMount, onDestroy } from 'svelte';
 	import { API_BASE_URL } from '$lib/config/api-base-url';
 	import { namespaceStore } from '$lib/stores/namespace.svelte';
@@ -31,7 +31,8 @@
 	let stream = $state<Stream | undefined>(undefined);
 	let messages = $state<StreamMessage[]>([]);
 	let loadingMessages = $state(false);
-	let selectedMessage = $state<StreamMessageContent | undefined>(undefined);
+	let expandedMessageSeq = $state<string | undefined>(undefined);
+	let expandedMessageContent = $state<StreamMessageContent | undefined>(undefined);
 	let loadingMessageContent = $state(false);
 	let isLiveConsuming = $state(false);
 	let ws = $state<WebSocket | undefined>(undefined);
@@ -109,13 +110,24 @@
 		}
 	}
 
-	async function selectMessage(msg: StreamMessage) {
+	async function toggleMessage(msg: StreamMessage) {
+		// If clicking the same message, collapse it
+		if (expandedMessageSeq === msg.stream_sequence) {
+			expandedMessageSeq = undefined;
+			expandedMessageContent = undefined;
+			return;
+		}
+
+		// Expand the new message
 		try {
 			loadingMessageContent = true;
+			expandedMessageSeq = msg.stream_sequence;
 			const sequence = parseInt(msg.stream_sequence);
-			selectedMessage = await client.fetchStreamMessageContent(accountId, streamName, sequence);
+			expandedMessageContent = await client.fetchStreamMessageContent(accountId, streamName, sequence);
 		} catch (e) {
 			showError(e as Error);
+			expandedMessageSeq = undefined;
+			expandedMessageContent = undefined;
 		} finally {
 			loadingMessageContent = false;
 		}
@@ -301,31 +313,31 @@
 			<div
 				bind:this={scrollContainer}
 				onscroll={handleScroll}
-				class="max-h-96 overflow-y-auto border rounded-lg"
+				class="max-h-145 overflow-y-auto border rounded-lg"
 			>
 				<Table.Root>
-					<Table.Header class="sticky top-0 bg-background z-10 border-b">
+					<Table.Header class="bg-muted/50 sticky top-0 z-10 border-b">
 						<Table.Row class="hover:bg-transparent">
-							<Table.Head class="font-semibold w-24">Sequence</Table.Head>
-							<Table.Head class="font-semibold">Subject</Table.Head>
-							<Table.Head class="font-semibold">Preview</Table.Head>
-							<Table.Head class="font-semibold w-20">Size</Table.Head>
-							<Table.Head class="font-semibold w-40">Timestamp</Table.Head>
-							<Table.Head class="font-semibold w-12"></Table.Head>
+							<Table.Head class="text-muted-foreground h-12 px-4 text-xs font-semibold uppercase tracking-wider w-24">Sequence</Table.Head>
+							<Table.Head class="text-muted-foreground h-12 px-4 text-xs font-semibold uppercase tracking-wider">Subject</Table.Head>
+							<Table.Head class="text-muted-foreground h-12 px-4 text-xs font-semibold uppercase tracking-wider">Preview</Table.Head>
+							<Table.Head class="text-muted-foreground h-12 px-4 text-xs font-semibold uppercase tracking-wider w-20">Size</Table.Head>
+							<Table.Head class="text-muted-foreground h-12 px-4 text-xs font-semibold uppercase tracking-wider w-40">Timestamp</Table.Head>
+							<Table.Head class="text-muted-foreground h-12 px-4 text-xs font-semibold uppercase tracking-wider w-12"></Table.Head>
 						</Table.Row>
 					</Table.Header>
 					<Table.Body>
 						{#if loadingMessages && messages.length === 0}
 							<Table.Row>
 								{#each { length: 6 } as _}
-									<Table.Cell>
+									<Table.Cell class="px-4">
 										<Skeleton class="h-4 w-24" />
 									</Table.Cell>
 								{/each}
 							</Table.Row>
 						{:else if messages.length === 0}
 							<Table.Row>
-								<Table.Cell colspan={6}>
+								<Table.Cell colspan={6} class="px-4">
 									<div class="text-muted-foreground my-20 text-center">
 										<p>No messages in stream</p>
 									</div>
@@ -335,34 +347,53 @@
 							{#each messages as msg, i (i)}
 								{#if msg && msg.stream_sequence}
 									<Table.Row
-										class="group hover:bg-accent cursor-pointer transition-colors border-b last:border-b-0 {i %
+										class="group hover:bg-accent cursor-pointer transition-colors border-b-0 {i %
 										2 ===
 										0
 											? 'bg-muted/20'
 											: ''}"
-										onclick={() => selectMessage(msg)}
+										onclick={() => toggleMessage(msg)}
 									>
-										<Table.Cell class="font-mono">{msg.stream_sequence}</Table.Cell>
-										<Table.Cell>{msg.subject}</Table.Cell>
-										<Table.Cell class="text-muted-foreground">{msg.preview}</Table.Cell>
-										<Table.Cell class="font-mono text-sm"
+										<Table.Cell class="px-4 font-mono">{msg.stream_sequence}</Table.Cell>
+										<Table.Cell class="px-4">{msg.subject}</Table.Cell>
+										<Table.Cell class="px-4 text-muted-foreground">{msg.preview}</Table.Cell>
+										<Table.Cell class="px-4 font-mono text-sm"
 											>{formatBytes(msg.size_bytes)}</Table.Cell
 										>
-										<Table.Cell class="text-right text-muted-foreground"
+										<Table.Cell class="px-4 text-right text-muted-foreground"
 											>{formatEpoch(msg.timestamp)}</Table.Cell
 										>
-										<Table.Cell class="text-center w-12">
-											<Eye
-												class="size-4 text-muted-foreground group-hover:text-foreground inline-block transition-colors"
+										<Table.Cell class="px-4 text-center w-12">
+											<ChevronDown
+												class="size-4 text-muted-foreground group-hover:text-foreground inline-block transition-transform {expandedMessageSeq === msg.stream_sequence ? 'rotate-180' : ''}"
 											/>
 										</Table.Cell>
 									</Table.Row>
+
+									<!-- Expanded message content row -->
+									{#if expandedMessageSeq === msg.stream_sequence}
+										<Table.Row class="border-b {i % 2 === 0 ? 'bg-muted/20' : ''}">
+											<Table.Cell colspan={6} class="p-0">
+												<div class="px-6 py-4 bg-card/50 border-t">
+													{#if loadingMessageContent}
+														<div class="flex items-center justify-center py-8">
+															<LoaderCircle class="size-6 animate-spin text-muted-foreground" />
+														</div>
+													{:else if expandedMessageContent}
+														<div class="space-y-3">
+															<CodeBlock loading={false} content={decodedData(expandedMessageContent.data)} wrap />
+														</div>
+													{/if}
+												</div>
+											</Table.Cell>
+										</Table.Row>
+									{/if}
 								{/if}
 							{/each}
 						{/if}
 						{#if messages.length > 0 && !isLiveConsuming}
 							<Table.Row class="hover:bg-transparent border-0">
-								<Table.Cell colspan={6} class="pt-4 pb-3 bg-background">
+								<Table.Cell colspan={6} class="px-4 pt-4 pb-3 bg-background">
 									<div class="flex justify-center">
 										<Button variant="outline" onclick={loadMore} disabled={loadingMessages}>
 											{#if loadingMessages}
@@ -393,27 +424,4 @@
 		</div>
 	</div>
 
-	<!-- Selected Message Content -->
-	{#if selectedMessage}
-		<div>
-			<h2 class="mb-4 text-xl font-semibold sm:text-2xl">Message Content</h2>
-			<div class="border rounded-lg bg-card p-4 mb-4">
-				<div class="flex gap-8 text-sm">
-					<div class="space-y-1">
-						<div class="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-							Sequence
-						</div>
-						<div class="font-mono font-medium">{selectedMessage.stream_sequence}</div>
-					</div>
-					<div class="space-y-1">
-						<div class="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-							Timestamp
-						</div>
-						<div class="font-medium">{formatEpoch(selectedMessage.timestamp)}</div>
-					</div>
-				</div>
-			</div>
-			<CodeBlock loading={loadingMessageContent} content={decodedData(selectedMessage.data)} wrap />
-		</div>
-	{/if}
 </div>

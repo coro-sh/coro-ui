@@ -48,6 +48,7 @@ export interface OperatorResponse {
 	jwt: string;
 	name: string;
 	public_key: string;
+	last_connect_time?: number;
 	status: OperatorStatus;
 }
 

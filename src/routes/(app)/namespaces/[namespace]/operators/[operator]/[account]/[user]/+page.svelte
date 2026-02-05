@@ -1,10 +1,12 @@
 <script lang="ts">
 	import { Skeleton } from '$lib/components/ui/skeleton';
+	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
 	import TabGroup from '$lib/components/ui/tab/TabGroup.svelte';
 	import TabCard from '$lib/components/ui/tab/TabCard.svelte';
 	import UserOverview from '$lib/components/ui/user/UserOverview.svelte';
+	import EditUserModal from '$lib/components/ui/user/EditUserModal.svelte';
 	import UserIssuancesTable, {
 		type UserIssuancesTableApi,
 	} from '$lib/components/ui/user/UserIssuancesTable.svelte';
@@ -15,8 +17,10 @@
 	import type { AccountResponse, OperatorResponse, UserResponse } from '$lib/models/entity';
 	import { page } from '$app/state';
 	import { showError } from '$lib/stores/toast';
+	import { formatDuration } from '$lib/utils';
 
 	import Home from '@lucide/svelte/icons/home';
+	import Pencil from '@lucide/svelte/icons/pencil';
 
 	const namespaceId = $derived(page.params.namespace ?? '');
 	const operatorId = $derived(page.params.operator ?? '');
@@ -25,6 +29,7 @@
 
 	let loading = $state(true);
 	let loadFailed = $state(false);
+	let openEditModal = $state(false);
 	let operator = $state<OperatorResponse | undefined>(undefined);
 	let account = $state<AccountResponse | undefined>(undefined);
 	let user = $state<UserResponse | undefined>(undefined);
@@ -124,15 +129,74 @@
 		<TabGroup tabNames={['Overview', 'Connect']}>
 			{#snippet children(tab)}
 				{#if tab === 1}
-					<TabCard>
-						{#if user}
-							<UserOverview
-								bind:loading
-								bind:user
-								accountUserJWTLifetime={account?.limits.user_jwt_duration_secs}
-							/>
-						{/if}
-					</TabCard>
+					<div class="space-y-6">
+						<TabCard>
+							{#if user}
+								<UserOverview
+									bind:loading
+									bind:user
+									accountUserJWTLifetime={account?.limits.user_jwt_duration_secs}
+								/>
+							{/if}
+						</TabCard>
+
+						<!-- Limits Card -->
+						<TabCard>
+							<div class="mb-4 flex items-center justify-between">
+								<h2 class="text-foreground text-xl font-semibold sm:text-2xl">Limits</h2>
+								<Button variant="outline" size="sm" onclick={() => (openEditModal = true)}>
+									<Pencil class="size-4" />
+									Edit
+								</Button>
+							</div>
+							{#if loading}
+								<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+									{#each { length: 3 } as _}
+										<div class="border-border bg-muted/60 rounded-lg border p-4">
+											<Skeleton class="mb-2 h-4 w-24" />
+											<Skeleton class="h-6 w-32" />
+										</div>
+									{/each}
+								</div>
+							{:else if user}
+								<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+									<!-- Subscriptions -->
+									<div class="border-border bg-muted/60 rounded-lg border p-4">
+										<div class="text-muted-foreground mb-1 text-sm">Max Subscriptions</div>
+										<div class="text-foreground text-xl font-semibold">
+											{!user.limits.subscriptions || user.limits.subscriptions === -1 ? 'Unlimited' : user.limits.subscriptions}
+										</div>
+									</div>
+
+									<!-- Payload Size -->
+									<div class="border-border bg-muted/60 rounded-lg border p-4">
+										<div class="text-muted-foreground mb-1 text-sm">Max Payload Size</div>
+										<div class="text-foreground text-xl font-semibold">
+											{#if !user.limits.payload_size || user.limits.payload_size === -1}
+												Unlimited
+											{:else}
+												{Math.round(user.limits.payload_size / 1024)} KB
+											{/if}
+										</div>
+									</div>
+
+									<!-- JWT Lifetime -->
+									<div class="border-border bg-muted/60 rounded-lg border p-4">
+										<div class="text-muted-foreground mb-1 text-sm">JWT Lifetime</div>
+										<div class="text-foreground text-xl font-semibold">
+											{#if account?.limits.user_jwt_duration_secs}
+												{formatDuration(account.limits.user_jwt_duration_secs)} (account limit)
+											{:else if !user.limits.jwt_duration_secs}
+												No expiry
+											{:else}
+												{formatDuration(user.limits.jwt_duration_secs)}
+											{/if}
+										</div>
+									</div>
+								</div>
+							{/if}
+						</TabCard>
+					</div>
 				{:else if tab === 2}
 					<div class="grid grid-cols-1 gap-4 xl:grid-cols-2">
 						<Card.Root class="flex flex-col">
@@ -154,3 +218,7 @@
 		</TabGroup>
 	{/if}
 </main>
+
+{#if user}
+	<EditUserModal bind:open={openEditModal} bind:user accountUserJWTLifetime={account?.limits.user_jwt_duration_secs} />
+{/if}
