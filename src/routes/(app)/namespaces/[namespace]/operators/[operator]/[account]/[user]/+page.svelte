@@ -135,13 +135,13 @@
 					</TabCard>
 				{:else if tab === 2}
 					<div class="grid grid-cols-1 gap-4 xl:grid-cols-2">
-						<Card.Root>
-							<Card.Content class="p-6">
+						<Card.Root class="flex flex-col">
+							<Card.Content class="flex flex-1 flex-col p-6">
 								<UserGetConnected userId={user?.id} {issuancesApi} />
 							</Card.Content>
 						</Card.Root>
-						<Card.Root>
-							<Card.Content class="p-6">
+						<Card.Root class="flex flex-col">
+							<Card.Content class="flex flex-1 flex-col p-6">
 								<h2 class="mb-6 text-xl font-semibold sm:text-2xl">Credentials Issued</h2>
 								{#if user}
 									<UserIssuancesTable {user} bind:api={issuancesApi} />

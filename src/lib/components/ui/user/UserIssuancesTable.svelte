@@ -86,35 +86,44 @@
 	}
 </script>
 
-<div class="max-h-[580px] overflow-x-auto overflow-y-auto">
-	<Table.Root>
-		<Table.Header class="bg-muted sticky top-0">
-			<Table.Row>
-				{#each columns as title}
-					<Table.Head class="font-medium whitespace-nowrap">{title}</Table.Head>
-				{/each}
-			</Table.Row>
-		</Table.Header>
-		<Table.Body>
-			{#if loadingFirstPage}
-				<Table.Row>
-					{#each columns as _}
-						<Table.Cell>
-							<Skeleton class="h-4 w-24" />
-						</Table.Cell>
+<div class="border-border flex flex-1 flex-col overflow-hidden rounded-lg border">
+	<div class="flex-1 overflow-x-auto overflow-y-auto">
+		<Table.Root>
+			<Table.Header class="bg-muted/50 sticky top-0 z-10 border-b">
+				<Table.Row class="hover:bg-transparent">
+					{#each columns as title}
+						<Table.Head class="text-muted-foreground h-12 px-4 text-xs font-semibold uppercase tracking-wider">
+							{title}
+						</Table.Head>
 					{/each}
 				</Table.Row>
+			</Table.Header>
+		<Table.Body>
+			{#if loadingFirstPage}
+				{#each { length: 5 } as _}
+					<Table.Row class="hover:bg-transparent [&>td]:h-16 [&>td]:px-4">
+						{#each columns as _}
+							<Table.Cell>
+								<Skeleton class="h-4 w-32" />
+							</Table.Cell>
+						{/each}
+					</Table.Row>
+				{/each}
 			{:else if !issuances.length}
-				<Table.Row>
+				<Table.Row class="hover:bg-transparent">
 					<Table.Cell colspan={columns.length}>
-						<div class="text-muted-foreground my-20 text-center">
-							<p>No credentials issued</p>
+						<div class="text-muted-foreground py-24 text-center">
+							<p class="text-base font-medium">No credentials issued</p>
 						</div>
 					</Table.Cell>
 				</Table.Row>
 			{:else}
 				{#each issuances as iss, i (`${iss.issue_time}-${iss.expire_time}-${i}`)}
-					<Table.Row class={i < issuances.length - 1 ? 'border-b' : ''}>
+					<Table.Row
+						class="transition-colors duration-150 [&>td]:h-16 [&>td]:px-4 {i < issuances.length - 1
+							? 'border-b'
+							: 'border-0'}"
+					>
 						<Table.Cell>{formatEpoch(iss.issue_time)}</Table.Cell>
 						<Table.Cell>{iss.expire_time ? formatEpoch(iss.expire_time) : 'N/A'}</Table.Cell>
 						<Table.Cell>{iss.active ? 'Active' : 'Expired'}</Table.Cell>
@@ -123,7 +132,7 @@
 			{/if}
 			{#if hasMoreIssuances}
 				<Table.Row class="hover:bg-transparent border-0">
-					<Table.Cell colspan={columns.length} class="pt-4 pb-3">
+					<Table.Cell colspan={columns.length} class="px-4 py-6">
 						<div class="flex justify-center">
 							<Button variant="outline" size="sm" onclick={handleLoadMore} disabled={loadingMore}>
 								{#if loadingMore}
@@ -138,4 +147,5 @@
 			{/if}
 		</Table.Body>
 	</Table.Root>
+	</div>
 </div>

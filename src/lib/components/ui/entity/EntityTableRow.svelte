@@ -24,8 +24,9 @@
 <Table.Row
 	class={cn(
 		disabled ? 'cursor-not-allowed opacity-50' : 'hover:bg-accent/50 cursor-pointer',
-		'transition-colors',
-		bottomBorder ? 'border-border border-b' : ''
+		'transition-colors duration-150',
+		bottomBorder ? 'border-border border-b' : 'border-0',
+		'[&>td]:h-16 [&>td]:px-4'
 	)}
 	onclick={navigate}
 >

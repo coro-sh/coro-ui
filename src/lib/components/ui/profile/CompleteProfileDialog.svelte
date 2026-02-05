@@ -34,7 +34,7 @@
 </script>
 
 <AlertDialog.Root bind:open>
-	<AlertDialog.Content closable={false}>
+	<AlertDialog.Content>
 		<AlertDialog.Header>
 			<AlertDialog.Title>Tell us a bit about yourself</AlertDialog.Title>
 			<AlertDialog.Description>

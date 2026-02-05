@@ -47,7 +47,7 @@
 	{:else if !stats}
 		<TabCard>
 			<p class="text-muted-foreground text-sm">
-				No statistics available. Statistics are only available when the operator NATS server is
+				No metrics available. Metrics are only available when the operator NATS server is
 				connected and the account has active connections.
 			</p>
 		</TabCard>
