@@ -3,6 +3,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import * as Table from '$lib/components/ui/table';
+	import TabCard from '$lib/components/ui/tab/TabCard.svelte';
 	import CodeBlock from '$lib/components/ui/text/CodeBlock.svelte';
 	import { formatEpoch, formatBytes } from '$lib/utils';
 	import { CoroClient } from '$lib/coro-client';
@@ -238,7 +239,7 @@
 
 <div class="space-y-6">
 	<!-- Stream Info -->
-	<div>
+	<TabCard>
 		<h2 class="mb-4 text-xl font-semibold sm:text-2xl">Stream Details</h2>
 		{#if loading}
 			<div class="space-y-3">
@@ -247,43 +248,41 @@
 				{/each}
 			</div>
 		{:else if stream}
-			<div class="border rounded-lg bg-card p-6">
-				<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-					<div class="space-y-1">
-						<div class="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-							Messages
-						</div>
-						<div class="text-2xl font-semibold">{stream.message_count.toLocaleString()}</div>
+			<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+				<div class="space-y-1">
+					<div class="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+						Messages
 					</div>
-					<div class="space-y-1">
-						<div class="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-							Consumers
-						</div>
-						<div class="text-2xl font-semibold">{stream.consumer_count}</div>
+					<div class="text-2xl font-semibold">{stream.message_count.toLocaleString()}</div>
+				</div>
+				<div class="space-y-1">
+					<div class="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+						Consumers
 					</div>
-					<div class="space-y-1">
-						<div class="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-							Created
-						</div>
-						<div class="text-base font-medium">
-							{new Date(stream.create_time * 1000).toLocaleString()}
-						</div>
+					<div class="text-2xl font-semibold">{stream.consumer_count}</div>
+				</div>
+				<div class="space-y-1">
+					<div class="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+						Created
+					</div>
+					<div class="text-base font-medium">
+						{new Date(stream.create_time * 1000).toLocaleString()}
 					</div>
 				</div>
-				{#if stream.subjects && stream.subjects.length > 0}
-					<div class="mt-6 pt-6 border-t space-y-1">
-						<div class="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-							Subjects
-						</div>
-						<div class="text-sm font-medium font-mono">{stream.subjects.join(', ')}</div>
-					</div>
-				{/if}
 			</div>
+			{#if stream.subjects && stream.subjects.length > 0}
+				<div class="mt-6 pt-6 border-t space-y-1">
+					<div class="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+						Subjects
+					</div>
+					<div class="text-sm font-medium font-mono">{stream.subjects.join(', ')}</div>
+				</div>
+			{/if}
 		{/if}
-	</div>
+	</TabCard>
 
 	<!-- Messages -->
-	<div>
+	<TabCard>
 		<div class="mb-4 flex items-center justify-between">
 			<h2 class="text-xl font-semibold sm:text-2xl">Messages</h2>
 			<div class="flex gap-2 items-center">
@@ -309,11 +308,11 @@
 			</div>
 		</div>
 
-		<div class="overflow-x-auto relative">
+		<div class="overflow-x-auto relative border rounded-lg">
 			<div
 				bind:this={scrollContainer}
 				onscroll={handleScroll}
-				class="max-h-145 overflow-y-auto border rounded-lg"
+				class="max-h-145 overflow-y-auto"
 			>
 				<Table.Root>
 					<Table.Header class="bg-muted/50 sticky top-0 z-10 border-b">
@@ -408,20 +407,19 @@
 							</Table.Row>
 						{/if}
 					</Table.Body>
-				</Table.Root>
-			</div>
-
-			<!-- Scroll to bottom button -->
-			{#if showScrollButton}
-				<button
-					onclick={scrollToBottom}
-					class="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center justify-center rounded-full bg-primary p-2.5 text-primary-foreground shadow-lg transition-all hover:bg-primary/90 hover:shadow-xl"
-					aria-label={isLiveConsuming ? 'Resume auto-scroll' : 'Scroll to bottom'}
-				>
-					<ArrowDown class="size-4" />
-				</button>
-			{/if}
+			</Table.Root>
 		</div>
-	</div>
 
+		<!-- Scroll to bottom button -->
+		{#if showScrollButton}
+			<button
+				onclick={scrollToBottom}
+				class="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center justify-center rounded-full bg-primary p-2.5 text-primary-foreground shadow-lg transition-all hover:bg-primary/90 hover:shadow-xl"
+				aria-label={isLiveConsuming ? 'Resume auto-scroll' : 'Scroll to bottom'}
+			>
+				<ArrowDown class="size-4" />
+			</button>
+		{/if}
+	</div>
+</TabCard>
 </div>
